@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/eldat-form/public/static/css/main.5a4f61a3.chunk.css",
-    "main.js": "/eldat-form/public/static/js/main.efb4fc11.chunk.js",
-    "main.js.map": "/eldat-form/public/static/js/main.efb4fc11.chunk.js.map",
-    "runtime-main.js": "/eldat-form/public/static/js/runtime-main.5c127ec7.js",
-    "runtime-main.js.map": "/eldat-form/public/static/js/runtime-main.5c127ec7.js.map",
-    "static/js/2.b565840c.chunk.js": "/eldat-form/public/static/js/2.b565840c.chunk.js",
-    "static/js/2.b565840c.chunk.js.map": "/eldat-form/public/static/js/2.b565840c.chunk.js.map",
-    "index.html": "/eldat-form/public/index.html",
-    "precache-manifest.d767541c81ee5180ea783f95f61db3e7.js": "/eldat-form/public/precache-manifest.d767541c81ee5180ea783f95f61db3e7.js",
-    "service-worker.js": "/eldat-form/public/service-worker.js",
-    "static/css/main.5a4f61a3.chunk.css.map": "/eldat-form/public/static/css/main.5a4f61a3.chunk.css.map",
-    "static/js/2.b565840c.chunk.js.LICENSE.txt": "/eldat-form/public/static/js/2.b565840c.chunk.js.LICENSE.txt"
+    "main.css": "/eldat-form/build/static/css/main.5a4f61a3.chunk.css",
+    "main.js": "/eldat-form/build/static/js/main.a53161f8.chunk.js",
+    "main.js.map": "/eldat-form/build/static/js/main.a53161f8.chunk.js.map",
+    "runtime-main.js": "/eldat-form/build/static/js/runtime-main.406fd276.js",
+    "runtime-main.js.map": "/eldat-form/build/static/js/runtime-main.406fd276.js.map",
+    "static/js/2.b565840c.chunk.js": "/eldat-form/build/static/js/2.b565840c.chunk.js",
+    "static/js/2.b565840c.chunk.js.map": "/eldat-form/build/static/js/2.b565840c.chunk.js.map",
+    "index.html": "/eldat-form/build/index.html",
+    "precache-manifest.9cec1fee78a62ba3075089b1053da789.js": "/eldat-form/build/precache-manifest.9cec1fee78a62ba3075089b1053da789.js",
+    "service-worker.js": "/eldat-form/build/service-worker.js",
+    "static/css/main.5a4f61a3.chunk.css.map": "/eldat-form/build/static/css/main.5a4f61a3.chunk.css.map",
+    "static/js/2.b565840c.chunk.js.LICENSE.txt": "/eldat-form/build/static/js/2.b565840c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.5c127ec7.js",
+    "static/js/runtime-main.406fd276.js",
     "static/js/2.b565840c.chunk.js",
     "static/css/main.5a4f61a3.chunk.css",
-    "static/js/main.efb4fc11.chunk.js"
+    "static/js/main.a53161f8.chunk.js"
   ]
 }
