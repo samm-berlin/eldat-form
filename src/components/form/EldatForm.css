@@ -26,22 +26,70 @@ fieldset{
 [data-schemapath="root.document.eldat"] > .card,
 [data-schemapath="root.document.meta"] > .card,
 [data-schemapath="root.document.eldat.wood_allocation"] > .card,
+[data-schemapath="root.document.eldat.transfer_order"] > .card,
+[data-schemapath="root.document.eldat.measurement_journal"] > .card,
 [data-schemapath="root.document.eldat.wood_allocation.address"] > .card,
 [data-schemapath="root.document.eldat.delivery_note"] > .card,
 [data-schemapath="root.document.eldat.delivery_note.transfer_address"] > .card,
 [data-schemapath="root.document.eldat.delivery_note.transfer"] > .card,
 [data-schemapath="root.document.eldat.delivery_note.origin"] > .card,
-[data-schemapath="root.document.eldat.delivery_note.status"] > .card,
-[data-schemapath="root.document.eldat.clearing"] > .card
+[data-schemapath$=".status"] > .card,
+[data-schemapath="root.document.eldat.clearing"] > .card,
+[data-schemapath="root.document.eldat.wood_allocation.wood_data.wood_id"] > .card,
+[data-schemapath="root.document.eldat.wood_allocation.wood_data.allocated_wood"] > .card,
+[data-schemapath="root.document.eldat.wood_allocation.address.supplier.business"] > .card,
+[data-schemapath$=".quality_definition"] > .card,
+[data-schemapath$=".delivery_inf"] > .card,
+[data-schemapath$="coordinates"] .card,
+[data-schemapath$=".forest_measured"] > .card,
+[data-schemapath$="wood_certification"] > .card,
+[data-schemapath$=".contact"] > .card,
+[data-schemapath$=".measurement_data"] > .card
 {
     border: none !important;
     padding: 0 !important;
 }
+[data-schemapath$="coordinates"] .form-group > label
+{
+    display: none !important;
+}
 
-.btn-group>.btn-group:not(:last-child)>.btn, .btn-group>.btn:not(:last-child):not(.dropdown-toggle){
+.btn-group>.btn-group:not(:last-child)>.btn, 
+.btn-group>.btn:not(:last-child):not(.dropdown-toggle){
     width: 100%;
 }
 
 #download_link{
     opacity: 0;
+}
+[data-schemapath$=".wood_certificat"] > h3,
+[data-schemapath$=".process"] > h3,
+[data-schemapath$=".contact_telephone"] > h3,
+[data-schemapath$=".other_file"] > h3,
+[data-schemapath$=".wood_id"] > h3,
+[data-schemapath$=".certification"] > h3,
+[data-schemapath$="root.document.eldat.wood_allocation.wood_data.allocated_wood"] > h3,
+[data-schemapath$="root.document.eldat.wood_allocation.address.supplier.business"] > h3,
+[data-schemapath$="root.document.eldat.wood_allocation.wood_data.forest_measured.measurement_type_single_log.log.0.diameter_length"] > h3,
+[data-schemapath$=".quality_definition"] > h3,
+[data-schemapath$="wood_certification"] > h3,
+[data-schemapath$="contact"] > h3,
+[data-schemapath$=".status"] > h3,
+[data-schemapath$=".measurement_data"] > h3
+{
+    display: none !important;
+}
+
+[data-schemapath$='.0'] > .card-title {
+    display: block !important;
+}
+
+.json-editor-btn-delete , .json-editor-btntype-delete{
+    display: block;
+    margin: 0px auto 20px;
+}
+
+.nav-pills .nav-link.active, 
+.nav-pills .show>.nav-link{
+    white-space: nowrap;
 }
