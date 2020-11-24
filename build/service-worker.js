@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/eldat-form/build/precache-manifest.1b20b13efc2338f30103458353a97ded.js"
+  "/eldat-form/build/precache-manifest.27128fe9db0fa9257e0ce61949573bb2.js"
 );
 
 self.addEventListener('message', (event) => {

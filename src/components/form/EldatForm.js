@@ -1,7 +1,7 @@
 import React from 'react';
 //import Form from "@rjsf/core";
 import './EldatForm.css';
-import schema from '../../schema_1.0.3';
+import schema from '../../schema_1.0.2_new';
 
 //import Form from "@rjsf/material-ui";
 import { JSONEditor } from "@json-editor/json-editor";
