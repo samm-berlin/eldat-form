@@ -1501,16 +1501,16 @@ export default{
         },
         "mean_length_deviation": {
             "type": "object",
-            "title": "Abweichung von der mittlere Länge",
+            "title": "Abweichung von der mittleren Länge",
             "properties": {
                 "negative_deviation": {
-                    "title":"negative Abweichung",
+                    "title":"Negative Abweichung",
                     "description": "Differenz zwischen dem kürzesten Stamm und der Länge des Mittelstammes",
                     "type": "number",
                     "minimum":0
                 },
                 "positive_deviation": {
-                    "title":"positive Abweichung",
+                    "title":"Positive Abweichung",
                     "description": "Differenz zwischen dem längsten Stamm und der Länge des Mittelstammes",
                     "type": "number",
                     "minimum":0
@@ -4466,8 +4466,8 @@ export default{
                     "Masseermittlung (lutro, Fahrzeugwaage)", // Kranwaage
                     "Elektrische Widerstandsmessung", // raus
                     "Kluppe/Maßband", // Wald / Werk
-                    "fester Winkel", // industrie
-                    "variabler Winkel" // industrie
+                    "Fester Winkel", // industrie
+                    "Variabler Winkel" // industrie
                 ]
             },
             "type": "string"
@@ -5395,10 +5395,10 @@ export default{
                 },
                 "calibrated_values": {
                     "type": "array",
-                    "title": "geeichte Messergebnisse",
+                    "title": "Geeichte Messergebnisse",
                     "description": "Liste der Messergebnisse, die durch das geeichte Verfahren erhoben wurden.",
                     "items":{
-                        "title": "geeichte Messung",
+                        "title": "Geeichte Messung",
                         "properties": {
                             "calibrated_value": {
                                 "title": "Feldname",
@@ -6196,7 +6196,7 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "weighed_sample": {
-                                "title": "gewogenes Holz der Stichprobe",
+                                "title": "Gewogenes Holz der Stichprobe",
                                 "description": "t lutro mit Rinde",
                                 "type": "number"
                             },
@@ -6229,7 +6229,7 @@ export default{
                     }
                 },
                 "conversion_factor_qm_t": {
-                    "title": "hiebsbezogener Umrechnungsfaktor",
+                    "title": "Hiebsbezogener Umrechnungsfaktor",
                     "description": "Fm ohne Rinde / t lutro mit Rinde",
                     "type": "number"
                 },
@@ -6404,10 +6404,10 @@ export default{
                     "format": "datetime-local"
                 },
                 "calibration": {
-                    "title": "geeichtes Geräte",
+                    "title": "Geeichte Geräte",
                     "type": "array",
                     "items":{
-                        "title": "geeichtes Gerät",
+                        "title": "Geeichtes Gerät",
                         "type": "object",
                         "$ref": "#/definitions/calibration",
                     }
@@ -6431,9 +6431,15 @@ export default{
                                 "description": "Prozentualer Anteil der Trockenmasse am Poltergesamtgewicht",
                                 "type": "number"
                             },
-                            "calculated_amount": {
-                                "$ref": "#/definitions/calculated_amount",
-                                "title": "Menge",
+                            "weighed_amount": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Gewicht",
+                                "description": "Gemessenes Gewicht in Tonnen",
+                            },
+                            "weighed_sample": {
+                                "title": "Trockengehalt",
+                                "description": "Prozentualer Anteil der Trockenmasse am Poltergesamtgewicht",
+                                "type": "number"
                             },
                             "quality_definition":{
                                 "$ref": "#/definitions/quality_definition",
@@ -6545,7 +6551,7 @@ export default{
                 "route": {
                     "type": "array",
                     "minItems": 2,
-                    "description": "Streck auf der Karte",
+                    "description": "Strecke auf der Karte",
                     "items":{
                         "$ref": "#/definitions/lon_lat" 
                     }
