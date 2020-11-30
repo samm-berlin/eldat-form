@@ -1,7 +1,8 @@
 export default{
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "title": ".eldat schema",
-    "description": "Vorschau zur geplanten Version 1.0.3",
+    "$id": "https://raw.githubusercontent.com/kwf-ev/eldat-schema/1.0.3/schema_de.json",
+    "title": ".eldat schema 1.0.3",
+    "description": ".eldat data standard for communication between the partners in the wood supply chain.",
     "type": "object",
     "definitions": {
         "document": {
@@ -17,132 +18,185 @@ export default{
                     "$ref": "#/definitions/meta"
                 },
                 "eldat": {
-                    "title": ".eldat",
                     "$ref": "#/definitions/eldat"
                 }
-            },
-            "options":{
-                "compact": true
             }
         },
         "meta": {
             "title": "Envelope",
             "type": "object",
             "required": [
-                "version"
+                "version",
+                "transaction_id",
+                "process_id",
+                "module_id"
             ],
             "properties": {
                 "version": {
                     "title": "Version",
                     "type": "object",
-                    
                     "required": [
-                       "code"
+                        "code"
                     ],
                     "properties": {
                         "code": {
                             "title": "Versions-Code",
                             "type": "string",
-                            "default":"1.0.3",
                             "pattern": "[0-9]+.[0-9]+.[0-9]+$"
                         }
                     }
+                },
+                "transaction_id": {
+                    "description": "Eindeutige Kennung der Übermittlung",
+                    "$ref": "#/definitions/string36"
+                },
+                "process_id": {
+                    "description": "Eindeutige Kennung des Prozesses",
+                    "$ref": "#/definitions/string36"
+                },
+                "module_id": {
+                    "description": "Eindeutige Kennung des übermittelten Moduls",
+                    "$ref": "#/definitions/string36"
+                },
+                "status_tech": {
+                    "type": "object",
+                    "properties": {
+                        "code": {
+                            "type": "number",
+                            "title": "Technischer Status",
+                            "default": 100,
+                            "enum": [
+                                100,
+                                200
+                            ],
+                            "options": {
+                                "enum_titles": [
+                                    "erstellt",
+                                    "bearbeitet"
+                                ]
+                            }
+                        },
+                        "reference_module_id": {
+                            "description": "Eindeutige Kennung des Moduls, auf das sich bezogen wird.",
+                            "$ref": "#/definitions/string36"
+                        }
+                    },
+                    "required": [
+                        "code"
+                    ]
+                },
+                "response_system": {
+                    "description": "Eine Adresse auf die, mit einem .eldat Dokument, geantwortet werden kann. (Meist die url einer API des Senders dieses Dokumentes.)",
+                    "type": "object",
+                    "properties": {
+                        "uri": {
+                            "description": "Host, Pfad und Port der Adresse (z.B. https://api.example.com:3000/eldat/receive)",
+                            "$ref": "#/definitions/string255"
+                        },
+                        "user_id": {
+                            "description": "Eindeutige Kennung des Nutzers. (Meist die systeminterne ID des Senders der Nachricht.)",
+                            "$ref": "#/definitions/string36"
+                        }
+                    },
+                    "required": [
+                        "uri"
+                    ]
+                },
+                "request_system": {
+                    "description": "Eindeutige Kennung des Nutzers des Empfängersystems. (Meist die systeminterne ID des Empfängers der Nachricht.)",
+                    "$ref": "#/definitions/string36"
+                },
+                "created_by": {
+                    "type": "object",
+                    "properties": {
+                        "company": {
+                            "$ref": "#/definitions/string255"
+                        },
+                        "application": {
+                            "$ref": "#/definitions/string255"
+                        },
+                        "application_version": {
+                            "$ref": "#/definitions/string255"
+                        }
+                    }
                 }
-            },
-            "options":{
-                "compact": true
             }
         },
         "eldat": {
-            "title": ".eldat",
             "type": "object",
-            "additionalProperties": false,
             "oneOf": [
                 {
-                    "title": "Messprotokoll",
-                    "properties": {
-                        "measurement_journal": {
-                            "$ref": "#/definitions/measurement_journal"
-                        }
-                    },
-                    "required": ["measurement_journal"],
-                    
-                },
-                {
                     "title": "Holzbereitstellung",
+                    "type": "object",
                     "properties": {
                         "wood_allocation": {
                             "$ref": "#/definitions/wood_allocation"
                         }
-                    },
-                    "required": ["wood_allocation"],
-                    
-                },
-                {
-                    "title": "Lieferschein",
-                    "properties": {
-                        "delivery_note": {
-                            "$ref": "#/definitions/delivery_note"
-                        }
-                    },
-                    "required": ["delivery_note"],
-                   
+                    }
                 },
                 {
                     "title": "Abrechnung",
+                    "type": "object",
                     "properties": {
                         "clearing": {
                             "$ref": "#/definitions/clearing"
                         }
-                    },
-                    "required": ["clearing"],
-                   
+                    }
+                },
+                {
+                    "title": "Lieferschein",
+                    "type": "object",
+                    "properties": {
+                        "delivery_note": {
+                            "$ref": "#/definitions/delivery_note"
+                        }
+                    }
+                },
+                {
+                    "title": "Messprotokoll",
+                    "type": "object",
+                    "properties": {
+                        "measurement_journal": {
+                            "$ref": "#/definitions/measurement_journal"
+                        }
+                    }
                 },
                 {
                     "title": "Transportauftrag",
+                    "type": "object",
                     "properties": {
                         "transfer_order": {
                             "$ref": "#/definitions/transfer_order"
                         }
-                    },
-                    "required": ["transfer_order"],
-                    
+                    }
                 }
-            ]
+            ],
+            "additionalProperties": false,
+            "properties": {}
         },
         "clearing": {
-            "title": "Abrechnung",
             "type": "object",
             "format": "categories",
             "required": [
                 "clearing_address",
                 "invoice_header",
-                "status"
+                "status_arr"
             ],
             "properties": {
                 "clearing_address": {
                     "$ref": "#/definitions/clearing_address",
                     "title": "Abrechnungsadressen",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
                 "invoice_header": {
                     "$ref": "#/definitions/invoice_header",
                     "title": "Rechnungskopf",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
-                "status": {
-                    "$ref": "#/definitions/status",
+                "status_arr": {
+                    "$ref": "#/definitions/status_arr",
                     "title": "Status",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 }
             }
         },
@@ -281,6 +335,7 @@ export default{
             "maxLength": 100
         },
         "state": {
+            "title": "Staat",
             "enum": [
                 "DE",
                 "BY",
@@ -390,7 +445,9 @@ export default{
             "properties": {}
         },
         "cert_type": {
+            "title": "Zertifizierung",
             "enum": [
+                "xy",
                 "pefc",
                 "fsc1",
                 "natl",
@@ -407,6 +464,7 @@ export default{
             ],
             "options": {
                 "enum_titles": [
+                    "Keine",
                     "PEFC FM Zertifikat",
                     "FSC COC Zertifikat",
                     "Naturland",
@@ -455,18 +513,11 @@ export default{
                     "$ref": "#/definitions/district_name",
                     "title": "Reviername",
                     "description": "Offizieller Name des Revieres, falls vorhanden"
-                },
-                "district_description": {
-                    "type": "string",
-                    "title": "Abteilung",
-                },
-                "district_sub_description": {
-                    "type": "string",
-                    "title": "Unterabteilung",
                 }
             }
         },
         "business_type": {
+            "title": "Betriebsart",
             "enum": [
                 "bw",
                 "lw",
@@ -568,7 +619,7 @@ export default{
         "process": {
             "type": "array",
             "items": {
-                "title": "Vorgang",
+                "title": "Prozess",
                 "type": "object",
                 "properties": {
                     "ref_type": {
@@ -596,9 +647,11 @@ export default{
             "maxItems": 2
         },
         "ref_type": {
+            "title": "Referenznummerntyp",
             "enum": [
                 "afn",
                 "hin",
+                "kas",
                 "rha",
                 "rli",
                 "rsp",
@@ -623,6 +676,7 @@ export default{
                 "enum_titles": [
                     "Abfuhrfreigabenummer",
                     "Hiebsnummer",
+                    "Kassenzeichen",
                     "Referenznummer Holzabnehmer",
                     "Referenznummer Lieferant",
                     "Referenznummer Spediteur",
@@ -687,8 +741,7 @@ export default{
         },
         "crs": {
             "type": "string",
-            "default": "WGS84",
-            "pattern": "[0-9]{4,5}"
+            "pattern": "[A-Z0-9]{4,5}"
         },
         "tax": {
             "type": "object",
@@ -715,6 +768,7 @@ export default{
             ]
         },
         "tax_type": {
+            "title": "Besteuerung",
             "enum": [
                 "reg",
                 "pau"
@@ -728,6 +782,7 @@ export default{
             "type": "string"
         },
         "tax_no_type": {
+            "title": "Steuernummerntyp",
             "enum": [
                 "ust",
                 "stn",
@@ -749,7 +804,7 @@ export default{
         "contact": {
             "type": "array",
             "items": {
-                "title": "Kontakt",
+                "title":"Kontakt",
                 "type": "object",
                 "properties": {
                     "role_contact": {
@@ -781,6 +836,7 @@ export default{
                 "required": [
                     "role_contact",
                     "contact_surname",
+                    "contact_telephone",
                     "contact_email"
                 ]
             },
@@ -834,6 +890,7 @@ export default{
         "invoice_header": {
             "type": "array",
             "items": {
+                "title": "Rechnung Kopfdaten",
                 "type": "object",
                 "properties": {
                     "process": {
@@ -842,7 +899,7 @@ export default{
                         "description": ""
                     },
                     "invoice_currency": {
-                        "$ref": "#/definitions/invoice_currency",
+                        "$ref": "#/definitions/currency",
                         "title": "Währung",
                         "description": "Währung, die der gesamten Rechnung zu Grunde liegt"
                     },
@@ -890,11 +947,6 @@ export default{
                         "$ref": "#/definitions/invoice_text",
                         "title": "Rechnungstext",
                         "description": "Freie Texteingaben zur Abrechnung"
-                    },
-                    "cash_id": {
-                        "$ref": "#/definitions/cash_id",
-                        "title": "Kassenzeichen",
-                        "description": "Verwendungszweck"
                     },
                     "net_price": {
                         "$ref": "#/definitions/net_price",
@@ -961,52 +1013,8 @@ export default{
             },
             "properties": {}
         },
-        "invoice_currency": {
-            "enum": [
-                "EUR",
-                "USD",
-                "BGN",
-                "BYN",
-                "CAD",
-                "CHF",
-                "CZK",
-                "DKK",
-                "GBP",
-                "GEL",
-                "HRK",
-                "HUF",
-                "NOK",
-                "PLN",
-                "RON",
-                "RSD",
-                "SEK",
-                "UAH"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Euro",
-                    "US Dollar",
-                    "Lew",
-                    "Rubel",
-                    "Kanadische Dollar",
-                    "Franken",
-                    "Tschechische Krone",
-                    "Dänische Krone",
-                    "Pfund",
-                    "Lari",
-                    "Kuna",
-                    "Forint",
-                    "Norwegische Krone",
-                    "Zloty",
-                    "Leu",
-                    "Dinar",
-                    "Schwedische Krone",
-                    "Hrywnja"
-                ]
-            },
-            "type": "string"
-        },
         "invoice_type": {
+            "title": "Rechnungstyp",
             "enum": [
                 "abs",
                 "end",
@@ -1047,6 +1055,7 @@ export default{
             "format": "date-time"
         },
         "payment_procedure": {
+            "title": "Zahlungsverfahren",
             "enum": [
                 "rev",
                 "lav",
@@ -1065,16 +1074,13 @@ export default{
             "type": "string",
             "maxLength": 255
         },
-        "cash_id": {
-            "type": "string",
-            "maxLength": 30
-        },
         "net_price": {
             "type": "number"
         },
         "discount_surcharge": {
             "type": "array",
             "items": {
+
                 "type": "object",
                 "properties": {
                     "disc_sur_type": {
@@ -1106,13 +1112,13 @@ export default{
                 "required": [
                     "disc_sur_type",
                     "disc_sur_value",
-                    "disc_sur_unit",
-                    "disc_sur_text"
+                    "disc_sur_unit"
                 ]
             },
             "properties": {}
         },
         "disc_sur_type": {
+            "title": "Rabatt oder Zuschlag",
             "enum": [
                 "dis",
                 "sur"
@@ -1129,6 +1135,7 @@ export default{
             "type": "number"
         },
         "disc_sur_unit": {
+            "title": "Preiseinheit",
             "enum": [
                 "bei",
                 "bet",
@@ -1144,6 +1151,7 @@ export default{
             "type": "string"
         },
         "det_base": {
+            "title": "Bemessungsgrundlage",
             "enum": [
                 "cbm",
                 "lfm",
@@ -1198,6 +1206,7 @@ export default{
         "vat": {
             "type": "array",
             "items": {
+                "title": "Steuer",
                 "type": "object",
                 "properties": {
                     "vat_percent": {
@@ -1224,8 +1233,7 @@ export default{
                 "required": [
                     "vat_percent",
                     "vat_comp_contr",
-                    "vat_value",
-                    "vat_text"
+                    "vat_value"
                 ]
             },
             "properties": {}
@@ -1277,8 +1285,7 @@ export default{
                 "required": [
                     "discount_period",
                     "discount_percent",
-                    "discount_value",
-                    "discount_text"
+                    "discount_value"
                 ]
             },
             "properties": {}
@@ -1356,11 +1363,6 @@ export default{
                         "title": "Holznummer",
                         "description": ""
                     },
-                    "aggregation_type": {
-                        "$ref": "#/definitions/aggregation_type",
-                        "title": "Aggregationstyp",
-                        "description": "Kriterium nach dem Aggregiert wurde"
-                    },
                     "quality": {
                         "$ref": "#/definitions/quality",
                         "title": "Qualität",
@@ -1390,6 +1392,9 @@ export default{
                         "$ref": "#/definitions/mean_length",
                         "title": "Mittlere Länge",
                         "description": "(Mittlere) Länge des Holzes in der Aggregation"
+                    },
+                    "mean_length_deviation":{
+                        "$ref": "#/definitions/mean_length_deviation"
                     },
                     "grade_length": {
                         "$ref": "#/definitions/grade_length",
@@ -1449,7 +1454,6 @@ export default{
                 },
                 "required": [
                     "wood_id",
-                    "aggregation_type",
                     "grade",
                     "use",
                     "species",
@@ -1461,6 +1465,24 @@ export default{
             },
             "properties": {},
             "minItems": 1
+        },
+        "mean_length_deviation": {
+            "type": "object",
+            "title": "Abweichung von der mittleren Länge",
+            "properties": {
+                "negative_deviation": {
+                    "title":"Negative Abweichung",
+                    "description": "Differenz zwischen dem kürzesten Stamm und der Länge des Mittelstammes",
+                    "type": "number",
+                    "minimum":0
+                },
+                "positive_deviation": {
+                    "title":"Positive Abweichung",
+                    "description": "Differenz zwischen dem längsten Stamm und der Länge des Mittelstammes",
+                    "type": "number",
+                    "minimum":0
+                }
+            }
         },
         "wood_id": {
             "type": "array",
@@ -1487,6 +1509,7 @@ export default{
             "properties": {}
         },
         "wood_id_type": {
+            "title": "Holznummerntyp",
             "enum": [
                 "arb",
                 "art",
@@ -1495,6 +1518,8 @@ export default{
                 "los",
                 "pol",
                 "poa",
+                "pog",
+                "sta",
                 "vlo"
             ],
             "options": {
@@ -1506,6 +1531,8 @@ export default{
                     "Los-Nummer",
                     "Polternummer",
                     "Polter-Auftragsnummer",
+                    "Polter-GUID",
+                    "Stammnummer",
                     "Verkaufslos-Nummer"
                 ]
             },
@@ -1515,123 +1542,9 @@ export default{
             "type": "string",
             "maxLength": 36
         },
-        "aggregation_type": {
-            "enum": [
-                "so",
-                "vw",
-                "ha",
-                "qu",
-                "sk",
-                "du",
-                "la",
-                "soha",
-                "sohaqu",
-                "sohaqusk",
-                "sohaquskla",
-                "sohaqudu",
-                "sohaqudula",
-                "soqu",
-                "soqusk",
-                "soquskla",
-                "soqudu",
-                "soqudula",
-                "sosk",
-                "soskla",
-                "sodu",
-                "sodula",
-                "sovwha",
-                "sovwhaqu",
-                "sovwhaqusk",
-                "sovwqu",
-                "sovwqusk",
-                "sovwsk",
-                "vwha",
-                "vwhaqu",
-                "vwhaqusk",
-                "vwhaquskla",
-                "vwhaqudu",
-                "vwhaqudula",
-                "vwsk",
-                "haqu",
-                "haqula",
-                "haqusk",
-                "haquskla",
-                "haqudu",
-                "haqudula",
-                "hasovwqula",
-                "hasovwqulask",
-                "qusk",
-                "pol",
-                "los",
-                "ein",
-                "vwqu",
-                "vwhask",
-                "vwhaskla",
-                "vwhadu",
-                "vwhadula"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Sorte",
-                    "Verwendungssorte",
-                    "Holzart",
-                    "Qualität",
-                    "Stärkeklasse",
-                    "Durchmesser",
-                    "Länge",
-                    "Sorte/Holzart",
-                    "Sorte/Holzart/Qualität",
-                    "Sorte/Holzart/Qualität/Stärkeklasse",
-                    "Sorte/Holzart/Qualität/Stärkeklasse/Länge",
-                    "Sorte/Holzart/Qualität/Durchmesser",
-                    "Sorte/Holzart/Qualität/Durchmesser/Länge",
-                    "Sorte/Qualität",
-                    "Sorte/Qualität/Stärkeklasse",
-                    "Sorte/Qualität/Stärkeklasse/Länge",
-                    "Sorte/Qualität/Durchmesser",
-                    "Sorte/Qualität/Durchmesser/Länge",
-                    "Sorte/Stärkeklasse",
-                    "Sorte/Stärkeklasse/Länge",
-                    "Sorte/Durchmesser",
-                    "Sorte/Durchmesser/Länge",
-                    "Sorte/Verwendungssorte/Holzart",
-                    "Sorte/Verwendungssorte/Holzart/Qualität",
-                    "Sorte/Verwendungssorte/Holzart/Qualität/Stärkeklasse",
-                    "Sorte/Verwendungssorte/Qualität",
-                    "Sorte/Verwendungssorte/Qualität/Stärkeklasse",
-                    "Sorte/Verwendungssorte/Stärkeklasse",
-                    "Verwendungssorte/Holzart",
-                    "Verwendungssorte/Holzart/Qualität",
-                    "Verwendungssorte/Holzart/Qualität/Stärkeklasse",
-                    "Verwendungssorte/Holzart/Qualität/Stärkeklasse/Länge",
-                    "Verwendungssorte/Holzart/Qualität/Durchmesser",
-                    "Verwendungssorte/Holzart/Qualität/Durchmesser/Länge",
-                    "Verwendungssorte/Stärkeklasse",
-                    "Holzart/Qualität",
-                    "Holzart/Qualität/Länge",
-                    "Holzart/Qualität/Stärkeklasse",
-                    "Holzart/Qualität/Stärkeklasse/Länge",
-                    "Holzart/Qualität/Durchmesser",
-                    "Holzart/Qualität/Durchmesser/Länge",
-                    "Holzart/Sorte/Verwendungssorte/Qualität/Länge",
-                    "Holzart/Sorte/Verwendungssorte/Qualität/Länge/Stärkeklasse",
-                    "Qualität/Stärkeklasse",
-                    "Polter",
-                    "Los",
-                    "Einzelstamm",
-                    "Verwendungssorte/Qualität",
-                    "Verwendungssorte/Holzart/Stärkeklasse",
-                    "Verwendungssorte/Holzart/Stärkeklasse/Länge",
-                    "Verwendungssorte/Holzart/Durchmesser",
-                    "Verwendungssorte/Holzart/Durchmesser/Länge"
-                ]
-            },
-            "type": "string"
-        },
         "quality": {
             "type": "array",
             "items": {
-                "title": "Qualität",
                 "type": "object",
                 "properties": {
                     "qual_type": {
@@ -1659,6 +1572,7 @@ export default{
             "minItems": 1
         },
         "qual_type": {
+            "title": "Qualität",
             "enum": [
                 "o",
                 "in",
@@ -1752,6 +1666,7 @@ export default{
             "maximum": 100
         },
         "grade": {
+            "title": "Sorte",
             "enum": [
                 "xy",
                 "st",
@@ -1805,6 +1720,7 @@ export default{
             "type": "string"
         },
         "use": {
+            "title": "Verwendungssorte",
             "enum": [
                 "xy",
                 "f",
@@ -1912,6 +1828,7 @@ export default{
             "type": "string"
         },
         "species": {
+            "title": "Holzart",
             "enum": [
                 "xy",
                 "ndh",
@@ -2176,35 +2093,47 @@ export default{
             },
             "type": "string"
         },
+        "amount_one": {
+            "type": "object",
+            "properties": {
+                "amount_value": {
+                    "$ref": "#/definitions/amount_value",
+                    "title": "Mengenwert",
+                    "description": "Wert der ermittelten Menge in der Aggregation"
+                },
+                "amount_unit": {
+                    "$ref": "#/definitions/amount_unit",
+                    "title": "Mengeneinheit",
+                    "description": "Angabe der gewählten Mengeneinheit"
+                },
+                "conversion_factor_qm": {
+                    "$ref": "#/definitions/conversion_factor_qm"
+                }
+            },
+            "required": [
+                "amount_value",
+                "amount_unit"
+            ]
+        },
         "amount": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "amount_value": {
-                        "$ref": "#/definitions/amount_value",
-                        "title": "Mengenwert",
-                        "description": "Wert der ermittelten Menge in der Aggregation"
-                    },
-                    "amount_unit": {
-                        "$ref": "#/definitions/amount_unit",
-                        "title": "Mengeneinheit",
-                        "description": "Angabe der gewählten Mengeneinheit"
-                    }
-                },
-                "required": [
-                    "amount_value",
-                    "amount_unit"
-                ]
+                "$ref": "#/definitions/amount_one"
             },
             "properties": {},
             "minItems": 1
+        },
+        "conversion_factor_qm": {
+            "type": "number",
+            "title": "Umrechnungsfaktor",
+            "description": "Umrechnungsfaktor zu Festmeter",
+            "default": 1
         },
         "amount_value": {
             "type": "number"
         },
         "amount_unit": {
-            "default": "fmo",
+            "title": "Mengeneinheit",
             "enum": [
                 "atr",
                 "lut",
@@ -2214,8 +2143,7 @@ export default{
                 "lfm",
                 "cbm",
                 "fmo",
-                "rmm",
-                "fmm"
+                "rmm"
             ],
             "options": {
                 "enum_titles": [
@@ -2227,8 +2155,7 @@ export default{
                     "Laufmeter",
                     "Kubikmeter",
                     "Festmeter ohne Rinde",
-                    "Raummeter mit Rinde",
-                    "Festmeter mit Rinde",
+                    "Raummeter mit Rinde"
                 ]
             },
             "type": "string"
@@ -2276,6 +2203,7 @@ export default{
             "maximum": 200
         },
         "dia_measurement": {
+            "title": "Durchmesserermittlung",
             "enum": [
                 "mara",
                 "aura",
@@ -2301,6 +2229,7 @@ export default{
             "type": "string"
         },
         "bark_condition": {
+            "title": "Rindenzustand",
             "enum": [
                 "edr",
                 "ent",
@@ -2336,6 +2265,7 @@ export default{
             "maximum": 200
         },
         "thickness_class": {
+            "title": "Stärkeklasse",
             "enum": [
                 "o",
                 "ch_1a",
@@ -2461,7 +2391,7 @@ export default{
         "wood_certificat": {
             "type": "array",
             "items": {
-                "title": "Holzzertifikat",
+                "title": "Zertifikat",
                 "type": "object",
                 "properties": {
                     "wood_certificat_type": {
@@ -2489,6 +2419,7 @@ export default{
             "properties": {}
         },
         "wood_certificat_type": {
+            "title": "Holzzertifizierungstyp",
             "enum": [
                 "xy",
                 "pefc",
@@ -2538,6 +2469,7 @@ export default{
             "maxLength": 30
         },
         "article_class": {
+            "title": "Artikelgruppe",
             "enum": [
                 "dei",
                 "den",
@@ -2573,6 +2505,7 @@ export default{
             "maxLength": 255
         },
         "attribute": {
+            "title": "Preismerkmal",
             "enum": [
                 "lmi",
                 "lma",
@@ -2645,16 +2578,15 @@ export default{
             "type": "number"
         },
         "product_price_unit": {
+            "title": "Preiseinheit",
             "enum": [
                 "bei",
-                "bet",
-                "pro"
+                "bet"
             ],
             "options": {
                 "enum_titles": [
                     "Betrag je Einheit",
-                    "Absolutbetrag",
-                    "Prozent"
+                    "Absolutbetrag"
                 ]
             },
             "type": "string"
@@ -2682,8 +2614,7 @@ export default{
                 }
             },
             "required": [
-                "tax_rate_percent",
-                "tax_rate_text"
+                "tax_rate_percent"
             ]
         },
         "tax_rate_value": {
@@ -2697,48 +2628,52 @@ export default{
             "type": "string",
             "maxLength": 255
         },
-        "status": {
+        
+        "status_arr":{
             "title": "Status",
             "type": "array",
             "minItems": 1,
             "items": {
-                "title": "Status",
-                "type": "object",
-                "properties": {
-                    "creation_datetime": {
-                        "$ref": "#/definitions/creation_datetime",
-                        "title": "Erstelldatum und -zeit",
-                        "description": "Angabe des Datums, und gegebenenfalls der Uhrzeit, zu dem der Status erstellt wird"
-                    },
-                    "statusid": {
-                        "$ref": "#/definitions/statusid",
-                        "title": "Status-ID",
-                        "description": "Eindeutige Kennung der Statusaussage"
-                    },
-                    "additionalinformation": {
-                        "$ref": "#/definitions/additionalinformation",
-                        "title": "Zusatzinformationen",
-                        "description": "Freie Texteingabe für Informationen zum Status"
-                    },
-                    "coordinate": {
-                        "$ref": "#/definitions/coordinate",
-                        "title": "Koordinaten",
-                        "description": ""
-                    }
+                "$ref": "#/definitions/status"
+            }
+        },
+        "status": {
+            "title": "Status",
+            "type": "object",
+            "properties": {
+                "creation_datetime": {
+                    "$ref": "#/definitions/creation_datetime",
+                    "title": "Erstelldatum und -zeit",
+                    "description": "Angabe des Datums, und gegebenenfalls der Uhrzeit, zu dem der Status erstellt wird"
                 },
-                "required": [
-                    "statusid",
-                    "creation_datetime"
-                ]
-            },
+                "statusid": {
+                    "$ref": "#/definitions/statusid",
+                    "title": "Status-ID",
+                    "description": "Eindeutige Kennung der Statusaussage"
+                },
+                "additionalinformation": {
+                    "$ref": "#/definitions/additionalinformation",
+                    "title": "Zusatzinformationen",
+                    "description": "Freie Texteingabe für Informationen zum Status"
+                },
+                "coordinate": {
+                    "$ref": "#/definitions/coordinate",
+                    "title": "Koordinaten",
+                    "description": ""
+                }
+            }
         },
         "creation_datetime": {
             "type": "string",
-            "format": "datetime-local"
+            "format": "date-time"
         },
         "statusid": {
+            "title": "Status-ID",
             "enum": [
+                "10",
+                "20",
                 "30",
+                "40",
                 "50",
                 "60",
                 "70",
@@ -2753,7 +2688,10 @@ export default{
             ],
             "options": {
                 "enum_titles": [
+                    "Erstellt",
+                    "Geändert",
                     "Storniert",
+                    "Gesendet",
                     "Angenommen",
                     "Abgelehnt",
                     "Disponiert",
@@ -2767,55 +2705,35 @@ export default{
                     "Auftragsende"
                 ]
             },
-            "type": "string",
-            "default": "10"
+            "type": "string"
         },
         "additionalinformation": {
             "type": "string",
             "maxLength": 255
         },
         "delivery_note": {
-            "type": "object",
             "format": "categories",
-            "title":"Lieferschein",
+            "type": "object",
             "required": [
                 "transfer_address",
                 "transfer",
-                "status"
-                /*,"origin"*/
+                "status_arr"
             ],
             "properties": {
                 "transfer_address": {
                     "$ref": "#/definitions/transfer_address",
                     "title": "Transportadressen",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
                 "transfer": {
                     "$ref": "#/definitions/transfer",
                     "title": "Transport",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
-                /*"origin": {
-                    "$ref": "#/definitions/origin",
-                    "title": "Ursprung",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
-                },*/
-                "status": {
-                    "$ref": "#/definitions/status",
+                "status_arr": {
+                    "$ref": "#/definitions/status_arr",
                     "title": "Status",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 }
             }
         },
@@ -2893,6 +2811,7 @@ export default{
             ]
         },
         "location_type": {
+            "title": "Stellentyp",
             "enum": [
                 "pol",
                 "wal",
@@ -2987,11 +2906,10 @@ export default{
                     "title": "Koordinaten",
                     "description": ""
                 },
-                "geo_json": {
-                    "$ref": "#/definitions/geo_json",
-                    "title": "An- und Abfuhr-Track",
-                    "description": "Punkte, Linien und Polygone als GeoJSON Feature formatiert."
-                },
+                "route_definition": {
+                    "$ref": "#/definitions/route_definition",
+                    "title": "An- und Abfuhr-Route"
+                }
             }
         },
         "location_name": {
@@ -3011,6 +2929,7 @@ export default{
             "maxLength": 100
         },
         "location_state": {
+            "title": "Staat",
             "enum": [
                 "DE",
                 "BY",
@@ -3254,8 +3173,8 @@ export default{
                     "title": "Lieferscheinnummer",
                     "description": "Eindeutige Kennung des Lieferscheines als Referenz"
                 },
-                "signature": {
-                    "$ref": "#/definitions/signature",
+                "signature_data": {
+                    "$ref": "#/definitions/signature_data",
                     "title": "Unterschrift",
                     "description": ""
                 }
@@ -3268,23 +3187,24 @@ export default{
             "type": "string",
             "maxLength": 30
         },
-        "signature": {
+        "signature_data": { 
             "type": "object",
             "properties": {
-                "signature_encoded": {
-                    "$ref": "#/definitions/signature_encoded",
-                    "title": "Codierte Unterschrift",
-                    "description": "Codierte Bilddaten"
-                },
                 "signature_string": {
-                    "$ref": "#/definitions/signature_string",
+                    "$ref": "#/definitions/string255",
                     "title": "Vorname Nachname",
                     "description": "Unterschrift in Klartext"
                 },
+                "signature_encoded": {
+                    "$ref": "#/definitions/string",
+                    "title": "Codierte Unterschrift",
+                    "description": "Codierte Bilddaten"
+                },
                 "signature_coding": {
-                    "$ref": "#/definitions/signature_coding",
+                    "$ref": "#/definitions/image_encode",
                     "title": "Codierung",
-                    "description": "Format, nach dem die Unterschrift codiert wurde"
+                    "description": "Format, nach dem die Unterschrift codiert wurde",
+                    "default": "base64"
                 }
             },
             "required": [
@@ -3292,25 +3212,6 @@ export default{
                 "signature_encoded",
                 "signature_coding"
             ]
-        },
-        "signature_string": {
-            "type": "string",
-            "maxLength": 150
-        },
-        "signature_encoded": {
-            "type": "string",
-            "maxLength": 150
-        },
-        "signature_coding": {
-            "type": "string",
-            "enum": [
-                "base64",
-            ],
-            "options": {
-                "enum_titles": [
-                    "base64",
-                ]
-            },
         },
         "haulier": {
             "type": "object",
@@ -3351,7 +3252,6 @@ export default{
         "haulier_telephone": {
             "type": "array",
             "items": {
-                "title": "Telefonnummer",
                 "type": "string",
                 "pattern": "^\\+?[0-9 /-]{5,20}$"
             }
@@ -3369,23 +3269,17 @@ export default{
                     "haul_means_no": {
                         "$ref": "#/definitions/haul_means_no",
                         "title": "Nummer des Transportmittels",
-                        "description": "Eindeutiges Kennzeichen des aufnehmenden Transportmittels (z.B. KFZ-Kennzeichen, Waggon-Kennung)"
+                        "description": "KFZ-Kennzeichen oder Waggon-Kennung des aufnehmenden Transportmittels"
                     },
-                    "haul_means_no_registration": {
-                        "$ref": "#/definitions/haul_means_no_registration",
-                        "title": "Zulassungsland des Transportmittels",
-                        "description": "Zulassungsland des Transportmittels"
-                    },
-                    "haul_amount": {
-                        "$ref": "#/definitions/haul_amount",
+                    "amount": {
+                        "$ref": "#/definitions/amount",
                         "title": "Menge",
-                        "description": "Die befördende Menge, definiert durch das Aufnahmeverfahren.",
-                        
+                        "description": ""
                     },
-                    "calculated_amount": {
-                        "$ref": "#/definitions/calculated_amount",
-                        "title": "Errechnete oder geschätzte Gesamtmenge",
-                        "description": "Aus dem Vermessungsverfahren errechnete Menge."
+                    "haul_measured": {
+                        "$ref": "#/definitions/haul_measured",
+                        "title": "Auflademenge",
+                        "description": "Die beförderte Menge, definiert durch das Aufnahmeverfahren."
                     },
                     "haul_text": {
                         "$ref": "#/definitions/haul_text",
@@ -3395,145 +3289,22 @@ export default{
                 },
                 "required": [
                     "haul_means_no",
-                    "haul_amount",
-                    "calculated_amount"
+                    "amount"
                 ]
             },
+            "properties": {},
             "minItems": 1
-        },
-        "haul_amount": {
-            "type": "object",
-            "title": "Holzmenge",
-            "description": "Die befördende Menge, definiert durch das Aufnahmeverfahren.",
-            "additionalProperties": false,
-            "oneOf": [
-                {
-                    "title": "Einzelstammvermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_single_log": {
-                            "$ref": "#/definitions/measurement_type_single_log"
-                        }
-                    },
-                    "required": ["measurement_type_single_log"]
-                },
-                {
-                    "title": "Foto-Optische-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_photo_optical": {
-                            "$ref": "#/definitions/measurement_type_photo_optical"
-                        }
-                    },
-                    "required": ["measurement_type_photo_optical"]
-                },
-                {
-                    "title": "Kran-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_crane": {
-                            "$ref": "#/definitions/measurement_type_crane"
-                        }
-                    },
-                    "required": ["measurement_type_crane"]
-                },
-            ]
         },
         "haul_means_no": {
             "type": "string",
             "maxLength": 30
-        },
-        "haul_means_no_registration": {
-            "enum": [
-                "DE",
-                "BY",
-                "BE",
-                "BG",
-                "DK",
-                "EE",
-                "FI",
-                "FR",
-                "GE",
-                "GR",
-                "IE",
-                "IS",
-                "IT",
-                "CA",
-                "HR",
-                "LV",
-                "LI",
-                "LT",
-                "LU",
-                "NL",
-                "NO",
-                "AT",
-                "PL",
-                "PT",
-                "RO",
-                "RU",
-                "SE",
-                "CH",
-                "RS",
-                "SK",
-                "SI",
-                "ES",
-                "CZ",
-                "UA",
-                "HU",
-                "US",
-                "GB",
-                "CX"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Deutschland",
-                    "Belarus",
-                    "Belgien",
-                    "Bulgarien",
-                    "Dänemark",
-                    "Estland",
-                    "Finnland",
-                    "Frankreich",
-                    "Georgien",
-                    "Griechenland",
-                    "Irland",
-                    "Island",
-                    "Italien",
-                    "Kanada",
-                    "Kroatien",
-                    "Lettland",
-                    "Liechtenstein",
-                    "Litauen",
-                    "Luxemburg",
-                    "Niederlande",
-                    "Norwegen",
-                    "Österreich",
-                    "Polen",
-                    "Portugal",
-                    "Rumänien",
-                    "Russische Föderation",
-                    "Schweden",
-                    "Schweiz",
-                    "Serbien",
-                    "Slowakei",
-                    "Slowenien",
-                    "Spanien",
-                    "Tschechien",
-                    "Ukraine",
-                    "Ungarn",
-                    "Vereinigte Staaten von Amerika",
-                    "Vereinigtes Königreich Großbritannien und Nordirland",
-                    "Weihnachtsinseln"
-                ]
-            },
-            "type": "string"
-
         },
         "haul_text": {
             "type": "string",
             "maxLength": 255
         },
         "origin": {
+            "title": "Ursprung",
             "type": "array",
             "items": {
                 "type": "object",
@@ -3542,16 +3313,10 @@ export default{
                         "$ref": "#/definitions/load",
                         "title": "Aufladung",
                         "description": ""
-                    },
-                    "pile_data": {
-                        "$ref": "#/definitions/pile_data",
-                        "title": "Polterdaten",
-                        "description": ""
                     }
                 },
                 "required": [
-                    "load",
-                    "pile_data"
+                    "load"
                 ]
             },
             "properties": {},
@@ -3622,14 +3387,13 @@ export default{
         "pile_data": {
             "type": "array",
             "items": {
-                "title": "Polter",
                 "type": "object",
                 "properties": {
-                    /*"wood_id": {
+                    "wood_id": {
                         "$ref": "#/definitions/wood_id",
                         "title": "Holznummer",
                         "description": ""
-                    },*/
+                    },
                     "product_data": {
                         "$ref": "#/definitions/product_data",
                         "title": "Produktdaten",
@@ -3665,38 +3429,108 @@ export default{
             "properties": {},
             "minItems": 1
         },
-        "product_data": {
+        "product_pile": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "title": "Polter",
                 "type": "object",
                 "properties": {
-                    /*"aggregation_type": {
-                        "$ref": "#/definitions/aggregation_type",
-                        "title": "Aggregationstyp",
-                        "description": "Kriterium nach dem Aggregiert wurde"
-                    },*/
                     "wood_id": {
                         "$ref": "#/definitions/wood_id",
                         "title": "Holznummer",
                         "description": ""
                     },
-                    /*"wood_definition": {
-                        "$ref": "#/definitions/wood_definition",
-                        "title": "Holzdefinition",
+                    "grade": {
+                        "$ref": "#/definitions/grade",
+                        "title": "Sorte",
+                        "description": "Angabe zur Holzsortierung"
+                    },
+                    "use": {
+                        "$ref": "#/definitions/use",
+                        "title": "Verwendungssorte",
+                        "description": "Angabe zur Verwendungssorte des Holzes"
+                    },
+                    "amount": {
+                        "$ref": "#/definitions/amount_one",
+                        "title": "Menge",
                         "description": ""
-                    },*/
-                    "calculated_amount": {
-                        "$ref": "#/definitions/calculated_amount",
-                        "title": "Errechnete oder geschätzte Gesamtmenge",
-                        "description": "Aus dem Vermessungsverfahren errechnete Menge."
                     },
                     "mean_length": {
                         "$ref": "#/definitions/mean_length",
                         "title": "Mittlere Länge",
-                        "description": "Mittlere Länge des vermessenen Holzes"
+                        "description": "(Mittlere) Länge des Holzes"
                     },
-                    "mean_diameter": {
-                        "$ref": "#/definitions/mean_diameter",
-                        "title": "Mittlerer Durchmesser",
-                        "description": "Mittlere Durchmesser des vermessenen Holzes"
+                    "mean_length_deviation":{
+                        "$ref": "#/definitions/mean_length_deviation"
+                    },
+                    "vat_rate": {
+                        "$ref": "#/definitions/vat_rate",
+                        "title": "Mehrwertsteuersatz",
+                        "description": "Mehrwertsteuersatz auf das beschriebene Holzprodukt"
+                    },
+                    "conversion_factor": {
+                        "$ref": "#/definitions/conversion_factor",
+                        "title": "Reduktionsfaktor",
+                        "description": "Reduktionsfaktor von Brutto- zu Nettowert des Polters"
+                    },
+                    "preservation": {
+                        "$ref": "#/definitions/preservation",
+                        "title": "Holzschutz",
+                        "description": "Angabe ob das Polter mit Holzschutz behandelt wurde"
+                    },
+                    "base_stems": {
+                        "$ref": "#/definitions/integer",
+                        "title": "Polterunterlagen",
+                        "description": "Anzahl der Stämme als Polterunterlage"
+                    },
+                    "all_wood_text": {
+                        "$ref": "#/definitions/all_wood_text",
+                        "title": "Bemerkungen zum Polter",
+                        "description": "Freie Texteingabe für Informationen zum Polter"
+                    },
+                    "coordinate": {
+                        "$ref": "#/definitions/coordinate",
+                        "title": "Koordinaten",
+                        "description": ""
+                    },
+                    "other_file": {
+                        "$ref": "#/definitions/other_file",
+                        "title": "Dateianhang",
+                        "description": ""
+                    }
+                },
+                "required": [
+                    "quality",
+                    "grade",
+                    "use",
+                    "amount"
+                ]
+            }
+        },
+        "product_data": {
+            "type": "array",
+            "items": {
+                "title": "Polter",
+                "type": "object",
+                "properties": {
+                    "wood_id": {
+                        "$ref": "#/definitions/wood_id",
+                        "title": "Holznummer",
+                        "description": ""
+                    },
+                    "wood_definition": {
+                        "$ref": "#/definitions/wood_definition",
+                        "title": "Holzdefinition",
+                        "description": ""
+                    },
+                    "mean_length": {
+                        "$ref": "#/definitions/mean_length",
+                        "title": "Mittlere Länge",
+                        "description": "(Mittlere) Länge des Holzes in der Aggregation"
+                    },
+                    "mean_length_deviation":{
+                        "$ref": "#/definitions/mean_length_deviation"
                     },
                     "vat_rate": {
                         "$ref": "#/definitions/vat_rate",
@@ -3705,19 +3539,15 @@ export default{
                     }
                 },
                 "required": [
-                    "aggregation_type",
                     "wood_definition"
                 ]
-            
+            },
+            "properties": {},
+            "minItems": 1
         },
         "wood_definition": {
             "type": "object",
             "properties": {
-                "quality": {
-                    "$ref": "#/definitions/quality",
-                    "title": "Qualität",
-                    "description": ""
-                },
                 "grade": {
                     "$ref": "#/definitions/grade",
                     "title": "Sorte",
@@ -3728,13 +3558,8 @@ export default{
                     "title": "Verwendungssorte",
                     "description": "Angabe zur Verwendungssorte des Holzes"
                 },
-                "species": {
-                    "$ref": "#/definitions/species",
-                    "title": "Holzart",
-                    "description": "Angabe zur Holzart"
-                },
                 "amount": {
-                    "$ref": "#/definitions/amount",
+                    "$ref": "#/definitions/amount_one",
                     "title": "Menge",
                     "description": ""
                 }
@@ -3754,9 +3579,7 @@ export default{
         "quality_attribute": {
             "additionalItems": false,
             "type": "array",
-            
             "items": {
-                "title": "Qualitätsmerkmal",
                 "enum": [
                     "ab",
                     "bk",
@@ -3844,7 +3667,7 @@ export default{
         "other_file": {
             "type": "array",
             "items": {
-                "title": "Dateianhang",
+                "title": "Datei",
                 "type": "object",
                 "properties": {
                     "path": {
@@ -3859,7 +3682,7 @@ export default{
                     }
                 },
                 "required": [
-                    "path",
+                    "path"
                 ]
             },
             "properties": {}
@@ -3874,27 +3697,26 @@ export default{
             "maxLength": 255
         },
         "measurement_journal": {
-            "type": "object",
             "format": "categories",
-            "title":"Messprotokoll",
+            "type": "object",
             "required": [
                 "other_address",
                 "measurement_data",
-                "status"
+                "status_arr"
             ],
             "properties": {
                 "other_address": {
                     "$ref": "#/definitions/other_address",
-                    "title": "Adressen",
+                    "title": "Weitere Adressen",
                     "description": ""
                 },
                 "measurement_data": {
                     "$ref": "#/definitions/measurement_data",
-                    "title": "Vermessungen",
+                    "title": "Vermessungs-Kopfdaten",
                     "description": ""
                 },
-                "status": {
-                    "$ref": "#/definitions/status",
+                "status_arr": {
+                    "$ref": "#/definitions/status_arr",
                     "title": "Status",
                     "description": ""
                 }
@@ -3903,7 +3725,7 @@ export default{
         "other_address": {
             "type": "array",
             "items": {
-                "title": "Adresse",
+                "title": "andere Adresse",
                 "type": "object",
                 "properties": {
                     "other_business": {
@@ -3948,6 +3770,7 @@ export default{
             ]
         },
         "role_business": {
+            "title": "Rolle",
             "enum": [
                 "abn",
                 "ent",
@@ -3977,9 +3800,6 @@ export default{
             "type": "string"
         },
         "measurement_data": {
-            /*"type": "array",
-            "minItems": 1,
-            "items": {*/
                 "title": "Vermessung",
                 "type": "object",
                 "properties": {
@@ -3993,41 +3813,24 @@ export default{
                         "title": "Holznummer",
                         "description": ""
                     },
-                    /*"calibration_id": {
-                        "$ref": "#/definitions/calibration_id",
-                        "title": "Eich-ID",
-                        "description": "ID zur Überprüfung der Eichung"
+                    "business_transaction":{
+                        "$ref": "#/definitions/business_transaction"
                     },
-                    "calibrated_until": {
-                        "$ref": "#/definitions/calibrated_until",
-                        "title": "Eichung gültig bis",
-                        "description": "Datum bis zu dem das Gerät geeicht ist"
-                    },*/
-                    /*"measuring_medium": {
-                        "$ref": "#/definitions/measuring_medium",
-                        "title": "Vermessungsart",
-                        "description": "Verfahren das zur Vermessung verwendet wurde (gegebenenfalls nicht abrechnungsrelevant)"
-                    },*/
+                    "other_file": {
+                        "$ref": "#/definitions/other_file",
+                        "title": "Dateianhang",
+                        "description": ""
+                    },
                     "industrie_measured": {
                         "$ref": "#/definitions/industrie_measured",
                         "title": "Werkmaß",
                         "description": ""
-                    },
-                    /*"measurement": {
-                        "$ref": "#/definitions/measurement",
-                        "title": "Vermessung",
-                        "description": ""
-                    }*/
+                    }
                 },
                 "required": [
                     "measurer",
-                    "measurement_method",
-                    "calibration_id",
-                    "calibrated_until",
-                    "measuring_medium",
-                    "measurement"
+                    "industrie_measured"
                 ]
-            //},
         },
         "measurer": {
             "type": "object",
@@ -4044,58 +3847,9 @@ export default{
                 }
             }
         },
-        "measurement_method": {
-            "enum": [
-                "mit",
-                "mis",
-                "arm",
-                "srm",
-                "krm",
-                "stf",
-                "zae",
-                "stz",
-                "wev",
-                "gwm",
-                "gwa",
-                "gwl",
-                "stg",
-                "zsv",
-                "fra",
-                "lfm",
-                "son",
-                "hvm",
-                "opv",
-                "xy"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Mittenstärkenvermessung",
-                    "Mittenstärkenstichprobenverfahren",
-                    "Raummaßverfahren allgemein",
-                    "Sektionsraummaßverfahren",
-                    "Konventionelles Raummaßverfahren",
-                    "Stirnflächenverfahren",
-                    "Zählung",
-                    "Schätzung",
-                    "Werkvermessung",
-                    "Gewichtsmaßermittlung",
-                    "Gewichtsmaßermittlung atro",
-                    "Gewichtsmaßermittlung lutro",
-                    "Stangenvermessung",
-                    "Zopfstärkenvermessung",
-                    "Fremdvermessung",
-                    "Laufmeter",
-                    "Sonstiges",
-                    "Harvestermaß",
-                    "optische Poltervermessung",
-                    "Keins"
-                ]
-            },
-            "type": "string"
-        },
         "screening_valid_to": {
             "type": "string",
-            "format": "date"
+            "format": "date-time"
         },
         "calibration_id": {
             "type": "string",
@@ -4103,124 +3857,7 @@ export default{
         },
         "calibrated_until": {
             "type": "string",
-            "format": "date"
-        },
-        "measuring_medium": {
-            "enum": [
-                "mit",
-                "mis",
-                "arm",
-                "srm",
-                "krm",
-                "stf",
-                "zae",
-                "stz",
-                "wev",
-                "gwm",
-                "gwa",
-                "gwl",
-                "stg",
-                "zsv",
-                "fra",
-                "lfm",
-                "son",
-                "hvm",
-                "opv",
-                "xy"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Mittenstärkenvermessung",
-                    "Mittenstärkenstichprobenverfahren",
-                    "Raummaßverfahren allgemein",
-                    "Sektionsraummaßverfahren",
-                    "Konventionelles Raummaßverfahren",
-                    "Stirnflächenverfahren",
-                    "Zählung",
-                    "Schätzung",
-                    "Werkvermessung",
-                    "Gewichtsmaßermittlung",
-                    "Gewichtsmaßermittlung atro",
-                    "Gewichtsmaßermittlung lutro",
-                    "Stangenvermessung",
-                    "Zopfstärkenvermessung",
-                    "Fremdvermessung",
-                    "Laufmeter",
-                    "Sonstiges",
-                    "Harvestermaß",
-                    "optische Poltervermessung",
-                    "Keins"
-                ]
-            },
-            "type": "string"
-        },
-        "measurement": {
-            "type": "object",
-            "properties": {
-                "photo_optical": {
-                    "$ref": "#/definitions/photo_optical",
-                    "title": "Photo-optisch",
-                    "description": ""
-                },
-                "gravimetric": {
-                    "$ref": "#/definitions/gravimetric",
-                    "title": "Gravimetrisch",
-                    "description": ""
-                },
-                "multi_log": {
-                    "$ref": "#/definitions/multi_log",
-                    "title": "Volumenaggregation",
-                    "description": ""
-                },
-                "single_log": {
-                    "$ref": "#/definitions/single_log",
-                    "title": "Einzelstamm",
-                    "description": ""
-                }
-            }
-        },
-        "photo_optical": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "measuring_data": {
-                        "$ref": "#/definitions/measuring_data",
-                        "title": "Vermessungsdaten",
-                        "description": ""
-                    },
-                    "photo_measuring_technique": {
-                        "$ref": "#/definitions/photo_measuring_technique",
-                        "title": "Messtechnik",
-                        "description": "Benennung der genutzten photo-optischen Messtechnik"
-                    },
-                    "photo_device_id": {
-                        "$ref": "#/definitions/photo_device_id",
-                        "title": "Geräte-ID",
-                        "description": "Einmalige Kennung des verwendeten Gerätes zur Photo-Vermessung"
-                    },
-                    "pile_pic": {
-                        "$ref": "#/definitions/pile_pic",
-                        "title": "Polterfoto",
-                        "description": ""
-                    },
-                    "photo_text": {
-                        "$ref": "#/definitions/photo_text",
-                        "title": "Bemerkung",
-                        "description": "Freies Eingabefeld für weitere Angaben"
-                    },
-                    "invoice_header": {
-                        "$ref": "#/definitions/invoice_header",
-                        "title": "Rechnungskopf",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "measuring_data",
-                    "pile_pic"
-                ]
-            },
-            "properties": {}
+            "format": "date-time"
         },
         "measuring_data": {
             "type": "object",
@@ -4257,86 +3894,9 @@ export default{
         "measurement_item": {
             "type": "number"
         },
-        "photo_measuring_technique": {
-            "enum": [
-                "klma",
-                "harv",
-                "inul",
-                "inin",
-                "drei",
-                "rokl",
-                "rome",
-                "foha",
-                "foim",
-                "fomo",
-                "tauv",
-                "stve",
-                "mame",
-                "elwi"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Kluppe/Maßband",
-                    "Harvesteraggregat",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Ultraschall)",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Infrarot)",
-                    "3D Messverfahren",
-                    "3D rotierende Kluppe",
-                    "Röntgen-Messverfahren",
-                    "Foto-optisches Messverfahren (handgeführtes Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/immobiles Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/mobiles Gerät)",
-                    "Tauchverfahren",
-                    "Schnelltrocknungsverfahren (atro, Probenwaage)",
-                    "Masseermittlung (lutro, Fahrzeugwaage)",
-                    "Elektrische Widerstandsmessung"
-                ]
-            },
-            "type": "string"
-        },
         "photo_device_id": {
             "type": "string",
             "maxLength": 30
-        },
-        "pile_pic": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "wood_id": {
-                        "$ref": "#/definitions/wood_id",
-                        "title": "Holznummer",
-                        "description": ""
-                    },
-                    "square_measure": {
-                        "$ref": "#/definitions/square_measure",
-                        "title": "Flächenmaß",
-                        "description": ""
-                    },
-                    "pile_pic_data": {
-                        "$ref": "#/definitions/pile_pic_data",
-                        "title": "Foto-Produktdaten",
-                        "description": ""
-                    },
-                    "coordinate": {
-                        "$ref": "#/definitions/coordinate",
-                        "title": "Koordinaten",
-                        "description": ""
-                    },
-                    "other_file": {
-                        "$ref": "#/definitions/other_file",
-                        "title": "Dateianhang",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "square_measure",
-                    "pile_pic_data",
-                    "coordinate"
-                ]
-            },
-            "properties": {},
-            "minItems": 1
         },
         "square_measure": {
             "type": "object",
@@ -4363,8 +3923,7 @@ export default{
             ]
         },
         "conversion_factor": {
-            "type": "number",
-            "default": 1
+            "type": "number"
         },
         "pile_front": {
             "type": "number"
@@ -4372,436 +3931,9 @@ export default{
         "pile_back": {
             "type": "number"
         },
-        "pile_pic_data": {
-            "type": "object",
-            "properties": {
-                "aggregation_type": {
-                    "$ref": "#/definitions/aggregation_type",
-                    "title": "Aggregationstyp",
-                    "description": "Kriterium nach dem Aggregiert wurde"
-                },
-                "aggregation_level": {
-                    "$ref": "#/definitions/aggregation_level",
-                    "title": "Aggregationsstufe",
-                    "description": "Angabe ob Holzpolter, Bahn-Waggon oder LKW-Fuhre vermessen wurde"
-                },
-                "wood_definition": {
-                    "$ref": "#/definitions/wood_definition",
-                    "title": "Holzdefinition",
-                    "description": ""
-                },
-                "mean_length": {
-                    "$ref": "#/definitions/mean_length",
-                    "title": "Mittlere Länge",
-                    "description": "(Mittlere) Länge des Holzes in der Aggregation"
-                },
-                "length_class": {
-                    "$ref": "#/definitions/length_class",
-                    "title": "Längenklasse",
-                    "description": "Angabe der vorliegenden Längenklasse"
-                },
-                "mean_diameter": {
-                    "$ref": "#/definitions/mean_diameter",
-                    "title": "Mittlerer Durchmesser",
-                    "description": "Mittlerer Durchmesser der Polterstämme"
-                },
-                "thickness_class": {
-                    "$ref": "#/definitions/thickness_class",
-                    "title": "Stärkeklasse",
-                    "description": "Klassifizierung der mittleren Stammstärke"
-                },
-                "quality_attribute": {
-                    "$ref": "#/definitions/quality_attribute",
-                    "title": "Qualitätsmerkmal",
-                    "description": "Angabe möglicher qualitätsrelevanter Merkmale"
-                },
-                "attribute": {
-                    "$ref": "#/definitions/attribute",
-                    "title": "Preismerkmale",
-                    "description": "Holzmerkmale die den Preis beeinflussen"
-                }
-            },
-            "required": [
-                "aggregation_type",
-                "wood_definition"
-            ]
-        },
-        "aggregation_level": {
-            "enum": [
-                "lkw",
-                "bahn",
-                "pol",
-                "mon",
-                "qua",
-                "jah",
-                "gesv",
-                "mesp"
-            ],
-            "options": {
-                "enum_titles": [
-                    "LKW-Fuhre",
-                    "Bahn-Waggon",
-                    "Polter",
-                    "Monat",
-                    "Quartal",
-                    "Jahr",
-                    "Gesamtvertrag",
-                    "Messprotokoll"
-                ]
-            },
-            "type": "string"
-        },
-        "length_class": {
-            "enum": [
-                "l1",
-                "l2",
-                "l3",
-                "l_lbh",
-                "lks1",
-                "lks2",
-                "lks3",
-                "lks4",
-                "llh_kranlang",
-                "lkh1",
-                "lkh2",
-                "llh_bahn",
-                "llh_lastwagen",
-                "bf",
-                "ku",
-                "kv",
-                "sus",
-                "slz",
-                "ild",
-                "iku",
-                "eld",
-                "eku",
-                "sue",
-                "sei",
-                "szw"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Nadelholz L1 (4-6m)",
-                    "Nadelholz L2 (6,5-14,5m)",
-                    "Nadelholz L3 (≥15m)",
-                    "Laubholz L_LBH (≥3m)",
-                    "Kleinstangen (13-15m)",
-                    "Kleinstangen (9-12m)",
-                    "Kleinstangen (6-8m)",
-                    "Kleinstangen (5m)",
-                    "Energie-Industrieholz_Länge: Langholz (3-7m Schrittmaß)",
-                    "Energie_Industrieholz_Länge: Kurzholz (1m)",
-                    "Energie-Industrieholz_Länge: Kurzholz (2m)",
-                    "Industrieholz_Länge: Langholz (5-6m Bahn)",
-                    "Industrieholz_Länge: Langholz (3-7m Lastwagen)",
-                    "Baumfallend",
-                    "Kranlänge unvermessen (3-7m)",
-                    "Kranlänge vermessen und abgelängt (3-7m)",
-                    "Stammholz Abschnitte, < 6 m",
-                    "Stammholz lang, zufällige Längen",
-                    "Industrieholz lang, > 3 m",
-                    "Industrieholz kurz, 1-3 m",
-                    "Energieholz lang, > 3 m",
-                    "Energieholz kurz, 1-3 m",
-                    "Scheitholz, < 1 m",
-                    "Schichtholz, 1 m",
-                    "Schichtholz, 2 m"
-                ]
-            },
-            "type": "string"
-        },
         "mean_diameter": {
             "type": "number",
             "maximum": 200
-        },
-        "photo_text": {
-            "type": "string",
-            "maxLength": 255
-        },
-        "gravimetric": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "measuring_data": {
-                        "$ref": "#/definitions/measuring_data",
-                        "title": "Vermessungsdaten",
-                        "description": ""
-                    },
-                    "gravi_measuring_technique": {
-                        "$ref": "#/definitions/gravi_measuring_technique",
-                        "title": "Messtechnik",
-                        "description": "Verwendete Messtechnik zur gravimetrischen Vermessung"
-                    },
-                    "vessel_scale_cal_to": {
-                        "$ref": "#/definitions/vessel_scale_cal_to",
-                        "title": "Eichdatum Fahrzeugwaage bis",
-                        "description": "Datum bis zu dem die Eichung der Fahrzeugwaage gültig ist"
-                    },
-                    "sample_scale_cal_to": {
-                        "$ref": "#/definitions/sample_scale_cal_to",
-                        "title": "Eichdatum Probenwaage bis",
-                        "description": "Datum bis zu dem die Eichung der Probenwaage gültig ist"
-                    },
-                    "pile_weight": {
-                        "$ref": "#/definitions/pile_weight",
-                        "title": "Poltergewicht",
-                        "description": ""
-                    },
-                    "gravimetric_text": {
-                        "$ref": "#/definitions/gravimetric_text",
-                        "title": "Bemerkungen",
-                        "description": "Freies Eingabefeld für Bemerkungen zur gravimetrischen Vermessung"
-                    },
-                    "invoice_header": {
-                        "$ref": "#/definitions/invoice_header",
-                        "title": "Rechnungskopf",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "measuring_data",
-                    "pile_weight"
-                ]
-            },
-            "properties": {}
-        },
-        "gravi_measuring_technique": {
-            "enum": [
-                "klma",
-                "harv",
-                "inul",
-                "inin",
-                "drei",
-                "rokl",
-                "rome",
-                "foha",
-                "foim",
-                "fomo",
-                "tauv",
-                "stve",
-                "mame",
-                "elwi"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Kluppe/Maßband",
-                    "Harvesteraggregat",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Ultraschall)",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Infrarot)",
-                    "3D Messverfahren",
-                    "3D rotierende Kluppe",
-                    "Röntgen-Messverfahren",
-                    "Foto-optisches Messverfahren (handgeführtes Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/immobiles Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/mobiles Gerät)",
-                    "Tauchverfahren",
-                    "Schnelltrocknungsverfahren (atro, Probenwaage)",
-                    "Masseermittlung (lutro, Fahrzeugwaage)",
-                    "Elektrische Widerstandsmessung"
-                ]
-            },
-            "type": "string"
-        },
-        "vessel_scale_cal_to": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "sample_scale_cal_to": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "pile_weight": {
-            "type": "object",
-            "properties": {
-                "wood_id": {
-                    "$ref": "#/definitions/wood_id",
-                    "title": "Holznummer",
-                    "description": ""
-                },
-                "wood_definition": {
-                    "$ref": "#/definitions/wood_definition",
-                    "title": "Holzdefinition",
-                    "description": ""
-                },
-                "dry_content": {
-                    "$ref": "#/definitions/dry_content",
-                    "title": "Trockengehalt",
-                    "description": "Prozentualer Anteil der Trockenmasse am Poltergesamtgewicht"
-                }
-            },
-            "required": [
-                "wood_definition"
-            ]
-        },
-        "dry_content": {
-            "type": "number",
-            "maximum": 100
-        },
-        "gravimetric_text": {
-            "type": "string",
-            "maxLength": 255
-        },
-        "multi_log": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "measuring_data": {
-                        "$ref": "#/definitions/measuring_data",
-                        "title": "Vermessungsdaten",
-                        "description": ""
-                    },
-                    "measuring_technique": {
-                        "$ref": "#/definitions/measuring_technique",
-                        "title": "Messtechnik",
-                        "description": "Verwendete Messtechnik zur volumetrischen Erfassung"
-                    },
-                    "aggregation_content": {
-                        "$ref": "#/definitions/aggregation_content",
-                        "title": "Vermessungsaggregation",
-                        "description": ""
-                    },
-                    "invoice_header": {
-                        "$ref": "#/definitions/invoice_header",
-                        "title": "Rechnungskopf",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "measuring_data",
-                    "aggregation_content"
-                ]
-            },
-            "properties": {}
-        },
-        "measuring_technique": {
-            "enum": [
-                "fixedAngle",
-                "variableAngle",
-                "klma",
-                "harv",
-                "inul",
-                "inin",
-                "drei",
-                "rokl",
-                "rome",
-                "foha",
-                "foim",
-                "fomo",
-                "tauv",
-                "stve",
-                "mame",
-                "elwi"
-            ],
-            "options": {
-                "enum_titles": [
-                    "fester Winkel",
-                    "variabler Winkel",
-                    "Kluppe/Maßband",
-                    "Harvesteraggregat",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Ultraschall)",
-                    "2D Messverfahren (zwei Ebenen Messung Infrarot/Infrarot)",
-                    "3D Messverfahren",
-                    "3D rotierende Kluppe",
-                    "Röntgen-Messverfahren",
-                    "Foto-optisches Messverfahren (handgeführtes Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/immobiles Gerät)",
-                    "Foto-optisches Messverfahren (montiertes/mobiles Gerät)",
-                    "Tauchverfahren",
-                    "Schnelltrocknungsverfahren (atro, Probenwaage)",
-                    "Masseermittlung (lutro, Fahrzeugwaage)",
-                    "Elektrische Widerstandsmessung"
-                ]
-            },
-            "type": "string"
-        },
-        "aggregation_content": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "wood_id": {
-                        "$ref": "#/definitions/wood_id",
-                        "title": "Holznummer",
-                        "description": ""
-                    },
-                    "aggregation_data": {
-                        "$ref": "#/definitions/aggregation_data",
-                        "title": "Volumen-Produktdaten",
-                        "description": ""
-                    },
-                    "other_file": {
-                        "$ref": "#/definitions/other_file",
-                        "title": "Dateianhang",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "aggregation_data"
-                ]
-            },
-            "properties": {},
-            "minItems": 1
-        },
-        "aggregation_data": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "aggregation_type": {
-                        "$ref": "#/definitions/aggregation_type",
-                        "title": "Aggregationstyp",
-                        "description": "Kriterium nach dem Aggregiert wurde"
-                    },
-                    "aggregation_level": {
-                        "$ref": "#/definitions/aggregation_level",
-                        "title": "Aggregationsstufe",
-                        "description": "Angabe ob Holzpolter, Bahn-Waggon oder LKW-Fuhre vermessen wurde"
-                    },
-                    "wood_definition": {
-                        "$ref": "#/definitions/wood_definition",
-                        "title": "Holzdefinition",
-                        "description": ""
-                    },
-                    "mean_length": {
-                        "$ref": "#/definitions/mean_length",
-                        "title": "Mittlere Länge",
-                        "description": "(Mittlere) Länge des Holzes in der Aggregation"
-                    },
-                    "mean_top_diameter": {
-                        "$ref": "#/definitions/mean_top_diameter",
-                        "title": "Mittlerer Zopfdurchmesser",
-                        "description": "(Mittlerer) Durchmesser des dünnen Endes in der Aggregation"
-                    },
-                    "mean_centre_diameter": {
-                        "$ref": "#/definitions/mean_centre_diameter",
-                        "title": "Mittlerer Mittendurchmesser",
-                        "description": "(Mittlerer) Durchmesser der Stammmitte in der Aggregation"
-                    },
-                    "mean_bottom_diameter": {
-                        "$ref": "#/definitions/mean_bottom_diameter",
-                        "title": "Mittlerer Stammfußdurchmesser",
-                        "description": "(Mittlerer) Durchmesser des dicken Endes der Stämme in der Aggregation"
-                    },
-                    "thickness_class": {
-                        "$ref": "#/definitions/thickness_class",
-                        "title": "Stärkeklasse",
-                        "description": "Klassifizierung der mittleren Stammstärke"
-                    },
-                    "attribute": {
-                        "$ref": "#/definitions/attribute",
-                        "title": "Preismerkmale",
-                        "description": "Holzmerkmale die den Preis beeinflussen"
-                    }
-                },
-                "required": [
-                    "aggregation_type",
-                    "wood_definition"
-                ]
-            },
-            "properties": {},
-            "minItems": 1
         },
         "mean_top_diameter": {
             "type": "number",
@@ -4815,154 +3947,10 @@ export default{
             "type": "number",
             "maximum": 200
         },
-        "single_log": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "measuring_data": {
-                        "$ref": "#/definitions/measuring_data",
-                        "title": "Vermessungsdaten",
-                        "description": ""
-                    },
-                    "measuring_technique": {
-                        "$ref": "#/definitions/measuring_technique",
-                        "title": "Messtechnik",
-                        "description": "Verwendete Messtechnik zur volumetrischen Erfassung"
-                    },
-                    "single_log_data": {
-                        "$ref": "#/definitions/single_log_data",
-                        "title": "Einzelstamm-Produktdaten",
-                        "description": ""
-                    },
-                    "other_file": {
-                        "$ref": "#/definitions/other_file",
-                        "title": "Dateianhang",
-                        "description": ""
-                    },
-                    "invoice_header": {
-                        "$ref": "#/definitions/invoice_header",
-                        "title": "Rechnungskopf",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "measuring_data",
-                    "single_log_data"
-                ]
-            },
-            "properties": {}
-        },
-        "single_log_data": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "part_no": {
-                        "$ref": "#/definitions/part_no",
-                        "title": "Stammabschnittsnummer",
-                        "description": "Nummerierung des Klammerstammstückes (1 = Erdstammstück, 2 = erstes Folgestück, etc.)"
-                    },
-                    "wood_id": {
-                        "$ref": "#/definitions/wood_id",
-                        "title": "Holznummer",
-                        "description": ""
-                    },
-                    "wood_definition": {
-                        "$ref": "#/definitions/wood_definition",
-                        "title": "Holzdefinition",
-                        "description": ""
-                    },
-                    "real_length": {
-                        "$ref": "#/definitions/real_length",
-                        "title": "Reale Länge",
-                        "description": "Physische Länge des Stammes"
-                    },
-                    "grade_length": {
-                        "$ref": "#/definitions/grade_length",
-                        "title": "Sortenlänge",
-                        "description": "Längenklasse des Holzes gemäß Sortierung"
-                    },
-                    "diameter": {
-                        "$ref": "#/definitions/diameter",
-                        "title": "Durchmesser",
-                        "description": ""
-                    },
-                    "grade_diameter_one": {
-                        "$ref": "#/definitions/grade_diameter_one",
-                        "title": "Sortendurchmesser 1",
-                        "description": "(Erstes) Messergebnis des Sortendurchmessers"
-                    },
-                    "grade_diameter_two": {
-                        "$ref": "#/definitions/grade_diameter_two",
-                        "title": "Sortendurchmesser 2",
-                        "description": "Zweites Messergebnis des Sortendurchmessers (Bei kreuzweiser Messung)"
-                    },
-                    "forest_mean_diameter": {
-                        "$ref": "#/definitions/forest_mean_diameter",
-                        "title": "Forstlicher Mittendurchmesser",
-                        "description": "Mittendurchmesser des Stammes, forstlich abgerundet"
-                    },
-                    "top_diameter": {
-                        "$ref": "#/definitions/top_diameter",
-                        "title": "Zopfdurchmesser",
-                        "description": "Durchmesser des dünnen Stammendes"
-                    },
-                    "bottom_diameter": {
-                        "$ref": "#/definitions/bottom_diameter",
-                        "title": "Stammfußdurchmesser",
-                        "description": "Durchmesser des dicken Stammendes"
-                    },
-                    "shrinking": {
-                        "$ref": "#/definitions/shrinking",
-                        "title": "Abholzigkeit",
-                        "description": "Durchmesserverringerung in Zentimeter je Meter"
-                    },
-                    "crook": {
-                        "$ref": "#/definitions/crook",
-                        "title": "Krümmung",
-                        "description": "Zentimeterabweichung der Stammmitte von der Stammgeraden je Meter"
-                    },
-                    "ovality": {
-                        "$ref": "#/definitions/ovality",
-                        "title": "Ovalität",
-                        "description": "Verhältnis des größten zum geringsten Durchmesser in Stammmitte bei kreuzweiser Vermessung"
-                    },
-                    "single_log_thickness_class": {
-                        "$ref": "#/definitions/single_log_thickness_class",
-                        "title": "Stärkeklasse",
-                        "description": "Klassifizierung des Stammes je Durchmesser"
-                    },
-                    "single_log_text": {
-                        "$ref": "#/definitions/single_log_text",
-                        "title": "Bemerkungen",
-                        "description": "Freies Eingabefeld für weitere Informationen zum Stamm"
-                    },
-                    "attribute": {
-                        "$ref": "#/definitions/attribute",
-                        "title": "Preismerkmale",
-                        "description": "Holzmerkmale die den Preis beeinflussen"
-                    }
-                },
-                "required": [
-                    "wood_definition",
-                    "grade_diameter_one",
-                    "forest_mean_diameter",
-                    "top_diameter",
-                    "single_log_thickness_class"
-                ]
-            },
-            "properties": {},
-            "minItems": 1
-        },
         "real_length": {
             "type": "number"
         },
-        "grade_diameter_one": {
-            "type": "number",
-            "maximum": 200
-        },
-        "grade_diameter_two": {
+        "grade_diameter": {
             "type": "number",
             "maximum": 200
         },
@@ -4991,6 +3979,7 @@ export default{
             "maximum": 10
         },
         "single_log_thickness_class": {
+            "title": "Stärkeklasse",
             "enum": [
                 "o",
                 "ch_1a",
@@ -5078,14 +4067,13 @@ export default{
             "maxLength": 255
         },
         "transfer_order": {
-            "type": "object",
             "format": "categories",
-            "title":"Transportauftrag",
+            "type": "object",
             "required": [
                 "transfer_address",
                 "transfer_inf",
                 "pile_data",
-                "status"
+                "status_arr"
             ],
             "properties": {
                 "transfer_address": {
@@ -5108,8 +4096,8 @@ export default{
                     "title": "Polterdaten",
                     "description": ""
                 },
-                "status": {
-                    "$ref": "#/definitions/status",
+                "status_arr": {
+                    "$ref": "#/definitions/status_arr",
                     "title": "Status",
                     "description": ""
                 }
@@ -5212,8 +4200,13 @@ export default{
                     "title": "Bemessungsgrundlage",
                     "description": "Einheitsangabe, falls Preis pro Einheit"
                 },
+                "other_det_base": {
+                    "$ref": "#/definitions/string50",
+                    "title": "Sonstige Bemessungsgrundlage",
+                    "description": "Definition welche sonstige Bemessungsgrundlage herangezogen wird"
+                },
                 "trans_price_currency": {
-                    "$ref": "#/definitions/trans_price_currency",
+                    "$ref": "#/definitions/currency",
                     "title": "Währung",
                     "description": "Angabe über die Währung in der die Transportkosten errechnet werden"
                 }
@@ -5223,21 +4216,21 @@ export default{
             "type": "number"
         },
         "trans_price_unit": {
+            "title":"Preiseinheit",
             "enum": [
                 "bei",
-                "bet",
-                "pro"
+                "bet"
             ],
             "options": {
                 "enum_titles": [
                     "Betrag je Einheit",
-                    "Absolutbetrag",
-                    "Prozent"
+                    "Absolutbetrag"
                 ]
             },
             "type": "string"
         },
-        "trans_price_currency": {
+        "currency": {
+            "title": "Währung",
             "enum": [
                 "EUR",
                 "USD",
@@ -5335,72 +4328,31 @@ export default{
                             "JAB-Code",
                             "Codablock"
                         ]
-                    },
+                    }
                 },
-                /*"barcode_subtype": {
-                    "$ref": "#/definitions/barcode_subtype",
-                    "title": "Barcodesubtyp",
-                    "description": "Angabe eines möglichen Barcodesubtyps"
-                },
-                "barcode_length": {
-                    "$ref": "#/definitions/barcode_length",
-                    "title": "Barcodelänge",
-                    "description": "Anzahl der Zeichen im Barcode"
-                },
-                "character_set": {
-                    "$ref": "#/definitions/character_set",
-                    "title": "Zeichensatz",
-                    "description": "Angabe der zulässigen Zeichen im Barcode"
-                },*/
                 "content": {
                     "$ref": "#/definitions/content",
                     "title": "Dateninhalt",
                     "description": "Klartext-Eingabe der zu verschlüsselnden Daten"
                 }
-                /*"codification": {
-                    "$ref": "#/definitions/codification",
-                    "title": "Kodierung",
-                    "description": "Angabe ob Strichcode, Stapelcode, Matrixcode oder Farbcode"
-                }*/
             },
             "required":[
                 "barcode_type",
                 "content"
             ]
         },
-        "barcode_type": {
-            "type": "string",
-            "maxLength": 25
-        },
-        "barcode_subtype": {
-            "type": "string"
-        },
-        "barcode_length": {
-            "type": "number",
-            "maximum": 128
-        },
-        "character_set": {
-            "type": "string",
-            "maxLength": 25
-        },
         "content": {
             "type": "string",
             "maxLength": 255
         },
-        "codification": {
-            "type": "string",
-            "maxLength": 128
-        },
         "wood_allocation": {
-            "title": "Holzbereitstellung",
             "type": "object",
             "format": "categories",
-            "basicCategoryTitle": "Dokumentfunktion",
             "required": [
                 "doc_type",
                 "address",
                 "wood_data",
-                "status"
+                "status_arr"
             ],
             "properties": {
                 "doc_type": {
@@ -5411,39 +4363,27 @@ export default{
                 "address": {
                     "$ref": "#/definitions/address",
                     "title": "Adressen",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
                 "delivery_inf": {
                     "$ref": "#/definitions/delivery_inf",
                     "title": "Lieferinformation",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
                 "wood_data": {
                     "$ref": "#/definitions/wood_data",
                     "title": "Holzdaten",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 },
-                "status": {
-                    "$ref": "#/definitions/status",
+                "status_arr": {
+                    "$ref": "#/definitions/status_arr",
                     "title": "Status",
-                    "description": "",
-                    "options": {
-                        "compact": true
-                    }
+                    "description": ""
                 }
-            },
-            
+            }
         },
         "doc_type": {
+            "title": "Dokumentfunktion",
             "enum": [
                 "abf",
                 "ang",
@@ -5494,10 +4434,9 @@ export default{
                     "title": "Abfuhrfrist in Tagen",
                     "description": "Anzahl der Tage in denen die Abfuhr erfolgt sein muss"
                 },
-                "geo_json": {
-                    "$ref": "#/definitions/geo_json",
-                    "title": "An- und Abfuhr-Track",
-                    "description": "Punkte, Linien und Polygone als GeoJSON Feature formatiert."
+                "route_definition": {
+                    "$ref": "#/definitions/route_definition",
+                    "title": "An- und Abfuhr-Route"
                 },
                 "other_file": {
                     "$ref": "#/definitions/other_file",
@@ -5512,6 +4451,7 @@ export default{
             }
         },
         "delivery_term": {
+            "title": "Lieferbedingungen",
             "enum": [
                 "uws",
                 "uwe",
@@ -5554,10 +4494,10 @@ export default{
         },
         "trans_clearance_date": {
             "type": "string",
-            "format": "date"
+            "format": "date-time"
         },
         "trans_period_days": {
-            "type": "integer",
+            "type": "number",
             "pattern": "[0-9]{1,3}"
         },
         "del_inf_text": {
@@ -5565,8 +4505,58 @@ export default{
             "maxLength": 255
         },
         "wood_data": {
-            
-                "title": "Holzdaten",
+            "type": "object",
+            "properties": {
+                "wood_id": {
+                    "$ref": "#/definitions/wood_id",
+                    "title": "Holznummer",
+                    "description": ""
+                },
+                "felling_date": {
+                    "$ref": "#/definitions/felling_date",
+                    "title": "Hiebsdatum",
+                    "description": "Datum zu dem der Hieb durchgeführt wurde"
+                },
+                "wood_certification": {
+                    "$ref": "#/definitions/wood_certification",
+                    "title": "Holzzertifizierung",
+                    "description": ""
+                },
+                "allocated_pile": {
+                    "$ref": "#/definitions/allocated_pile",
+                    "title": "Polter",
+                    "description": ""
+                }
+            },
+            "required": [
+                "wood_id",
+                "felling_date",
+                "allocated_pile"
+            ]
+        },
+        "felling_date": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "business_transaction":{
+            "title": "Geschäftsvorfall",
+            "default": "VWe",
+            "type": "string",
+            "enum": [
+                "VWa",
+                "VWe"
+            ],
+            "options": {
+                "enum_titles": [
+                    "Verkauf nach Waldmaß",
+                    "Verkauf nach Werksmaß"
+                ]
+            }
+        },
+        "allocated_pile": { 
+            "type": "array",
+            "items": {
+                "title": "Vermessung & Polter",
                 "type": "object",
                 "properties": {
                     "wood_id": {
@@ -5575,168 +4565,16 @@ export default{
                         "description": ""
                     },
                     "business_transaction":{
-                        "title": "Geschäftsvorfall",
-                        "default": "factoryMeasurement",
-                        "type": "string",
-                        "enum": [
-                            "forestMeasurement",
-                            "factoryMeasurement"
-                        ],
-                        "options": {
-                            "enum_titles": [
-                                "Verkauf nach Waldmaß",
-                                "Verkauf nach Werksmaß"
-                            ]
-                        },
+                        "$ref": "#/definitions/business_transaction"
                     },
-                    /*"measurement_method": {
-                        "$ref": "#/definitions/measurement_method",
-                        "title": "Abrechnungsrelevantes Vermessungsverfahren",
-                        "description": "Angabe des Vermessungsverfahrens nach dem abgerechnet wird"
-                    },*/
-                    "felling_date": {
-                        "$ref": "#/definitions/felling_date",
-                        "title": "Hiebsdatum",
-                        "description": "Datum zu dem der Hieb durchgeführt wurde"
-                    },
-                    "wood_certification": {
-                        "$ref": "#/definitions/wood_certification",
-                        "title": "Holzzertifizierung",
-                        "description": ""
-                    },
-                    /*"product_data": {
-                        "$ref": "#/definitions/product_data",
-                        "title": "Produktdaten",
-                        "description": ""
-                    },*/
                     "forest_measured": {
                         "$ref": "#/definitions/forest_measured",
                         "title": "Waldmaß",
                         "description": ""
                     },
-                    "allocated_wood": {
-                        "$ref": "#/definitions/allocated_wood",
-                        "title": "Polterdaten",
-                        "description": ""
-                    }
-                },
-                "required": [
-                    "wood_id",
-                    "measurement_method",
-                    "felling_date",
-                    "allocated_wood"
-                ]
-           
-        },
-        "felling_date": {
-            "type": "string",
-            "format": "date"
-        },
-        "wood_depiction": {
-            "enum": [
-                "sh",
-                "wh",
-                "bh",
-                "ih",
-                "gl",
-                "ag"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Sägeholz-Modell",
-                    "Wertholz-Modell",
-                    "Brennholz-Modell",
-                    "Industrieholz-Modell",
-                    "Gesamtlos-Modell",
-                    "Aggregations-Modell"
-                ]
-            },
-            "type": "string"
-        },
-        "allocated_wood": {
-            "type": "array",
-            "items": {
-                "title": "Polter",
-                "type": "object",
-                "properties": {
-                    /*"wood_id": {
-                        "$ref": "#/definitions/wood_id",
-                        "title": "Holznummer",
-                        "description": ""
-                    },*/
-                    "wood_id": {
-                        "$ref": "#/definitions/wood_id",
-                        "title": "Holznummer",
-                        "description": ""
-                    },
-                    "measurement_datetime": {
-                        "title": "Aufnahmezeitpunkt",
-                        "type": "string",
-                        "format": "datetime-local"
-                    },
-                    "calculated_amount": {
-                        "$ref": "#/definitions/calculated_amount",
-                        "title": "Errechnete oder geschätzte Gesamtmenge",
-                    },
-                    "mean_length": {
-                        "$ref": "#/definitions/mean_length",
-                        "title": "Mittlere Länge",
-                        "description": "Mittlere Länge des vermessenen Holzes"
-                    },
-                    "mean_length_deviation": {
-                        "type": "object",
-                        "title": "Abweichung von der mittlere Länge",
-                        "properties": {
-                            "negative_deviation": {
-                                "title":"negative Abweichung",
-                                "description": "Differenz zwischen dem kürzesten Stamm und der Länge des Mittelstammes",
-                                "type": "number"
-                            },
-                            "positive_deviation": {
-                                "title":"positive Abweichung",
-                                "description": "Differenz zwischen dem längsten Stamm und der Länge des Mittelstammes",
-                                "type": "number"
-                            }
-                        }
-                    },
-                    "mean_diameter": {
-                        "$ref": "#/definitions/mean_diameter",
-                        "title": "Mittlerer Durchmesser",
-                        "description": "Mittlere Durchmesser des vermessenen Holzes"
-                    },
-                    "pile_base_stems": {
-                        "title": "Polterunterlagen",
-                        "description":"Anzahl der vermessenen Polterunterlagen",
-                        "type": "number"
-                    },
-                    "conversion_factor": {
-                        "$ref": "#/definitions/conversion_factor",
-                        "title": "Reduktionsfaktor",
-                        "description": "Reduktionsfaktor von Brutto- zu Nettowert des Polters"
-                    },
-                    "preservation": {
-                        "$ref": "#/definitions/preservation",
-                        "title": "Holzschutz",
-                        "description": "Angabe ob das Polter mit Holzschutz behandelt wurde"
-                    },
-                    "vat_rate": {
-                        "$ref": "#/definitions/vat_rate",
-                        "title": "Mehrwertsteuersatz",
-                        "description": "Mehrwertsteuersatz auf das beschriebene Holzprodukt"
-                    },
-                    "all_wood_text": {
-                        "$ref": "#/definitions/all_wood_text",
-                        "title": "Bemerkungen zum Polter",
-                        "description": "Freie Texteingabe für Informationen zum Polter"
-                    },
-                    "coordinate": {
-                        "$ref": "#/definitions/coordinate",
-                        "title": "Koordinaten",
-                        "description": ""
-                    },
-                    "other_file": {
-                        "$ref": "#/definitions/other_file",
-                        "title": "Dateianhang",
+                    "product_data": {
+                        "$ref": "#/definitions/product_pile",
+                        "title": "Polter",
                         "description": ""
                     }
                 },
@@ -5757,246 +4595,81 @@ export default{
             "type": "string",
             "maxLength": 255
         },
-
-        "geo_json": {
-            "type": "array",
-            "title": "Geo JSON",
-            "description": "Punktmarkierung oder Streck auf der Karte",
-            "items":{
-                "title": "Feature",
-                "type": "object",
-                "additionalProperties": false,
-                "oneOf": [
-                    {
-                        "title": "Punkt",
+        "calibration":{
+            "type":"object",
+            "properties":{
+                "calibration_id": {
+                    "$ref": "#/definitions/calibration_id",
+                    "title": "Eich-ID",
+                    "description": "ID zur Überprüfung der Eichung"
+                },
+                "calibrated_until": {
+                    "$ref": "#/definitions/calibrated_until",
+                    "title": "Eichung gültig bis",
+                    "description": "Datum bis zu dem das Gerät geeicht ist"
+                },
+                "calibrated_values": {
+                    "type": "array",
+                    "title": "Geeichte Messergebnisse",
+                    "description": "Liste der Messergebnisse, die durch das geeichte Verfahren erhoben wurden.",
+                    "items":{
+                        "title": "Geeichte Messung",
                         "properties": {
-                            "type": {
-                                "title": "Typ",
-                                "type":"string",
-                                "default": "point",
+                            "calibrated_value": {
+                                "title": "Feldname",
+                                "type": "string",
                                 "enum": [
-                                    "point",
-                                    "lineString",
-                                    "polygon"
+                                    "real_length",
+                                    "grade_length",
+                                    "diameter_length_grade",
+                                    "diameter_length_forest",
+                                    "diameter_length_top",
+                                    "diameter_length_bottom",
+                                    "shrinking",
+                                    "crook",
+                                    "crook_mid",
+                                    "ovality",
+                                    "ovality_relative",
+                                    "count",
+                                    "pile_front_area",
+                                    "pile_back_area",
+                                    "weighed_sample",
+                                    "diameter_length",
+                                    "stem_length"
                                 ],
                                 "options": {
                                     "enum_titles": [
-                                        "Point",
-                                        "LineString",
-                                        "Polygon"
+                                        "Reale Länge",
+                                        "Sortenlänge",
+                                        "Sortendurchmesser",
+                                        "Forstlicher Mittendurchmesser",
+                                        "Zopfdurchmesser",
+                                        "Stammfußsurchmesser",
+                                        "Abholzigkeit",
+                                        "Absolute Krümmung",
+                                        "Mittlere Krümmung",
+                                        "Absolute Ovalität",
+                                        "Relative Ovalität",
+                                        "Stückzahl",
+                                        "Fläche Poltervorderseite",
+                                        "Fläche Polterrückseite",
+                                        "Trockengehalt",
+                                        "Durchmesser an Position",
+                                        "Stammlänge"
                                     ]
-                                },
-                            },
-                            "coordinates": {
-                                "$ref": "#/definitions/lon_lat",
-                            }
-                        },
-                        "required": [
-                            "type",
-                            "coordinates"
-                        ],
-                        
-                    },
-                    {
-                        "title": "Strecke",
-                        "properties": {
-                            "type": {
-                                "title": "Typ",
-                                "type":"string",
-                                "default": "lineString",
-                                "enum": [
-                                    "point",
-                                    "lineString",
-                                    "polygon"
-                                ],
-                                "options": {
-                                    "enum_titles": [
-                                        "Point",
-                                        "LineString",
-                                        "Polygon"
-                                    ]
-                                },
-                            },
-                            "coordinates": {
-                                "type": "array",
-                                "minItems": 2,
-                                "items":{
-                                    "title": "Koordinatenpaar",
-                                    "$ref": "#/definitions/lon_lat"
                                 }
                             }
-                        },
-                        "required": [
-                            "type",
-                            "coordinates"
-                        ],
-                        
+                        }
                     }
-                ]
-            }
-        },
-        "lon_lat": {
-            "description":"Longitude, Latitude",
-            "type": "array",
-            "minItems": 2,
-            "maxItems": 2,
-            "items": {
-                "title": 'f',
-                "type": "number",
-            }
-        },
-        "calculated_amount":{
-            "type":"object",
-            "title": "Errechnete Menge",
-            "properties":{
-                "amount_value": {
-                    "$ref": "#/definitions/amount_value",
-                    "title": "Mengenwert",
-                    "description": "Wert der ermittelten Menge in der Aggregation"
-                },
-                "amount_unit": {
-                    "$ref": "#/definitions/amount_unit",
-                    "title": "Mengeneinheit",
-                    "description": "Angabe der gewählten Mengeneinheit"
-                },
-                "conversion_factor": {
-                    "type": "number",
-                    "title": "Umrechnungsfaktor",
-                    "description": "Umrechnungsfaktor zu Festmeter",
-                    "default": 1
                 }
             },
             "required":[
-                "amount_value",
-                "amount_unit"
-            ]
-        },
-        "forest_measured":{
-            "type": "object",
-            "title": "Waldmaß",
-            "type": "object",
-            "oneOf": [
-                {
-                    "title": "Einzelstammvermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_single_log": {
-                            "$ref": "#/definitions/measurement_type_single_log"
-                        }
-                    },
-                    "required": ["measurement_type_single_log"]
-                },
-                {
-                    "title": "Stirnflächenverfahren",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_surfaces": {
-                            "$ref": "#/definitions/measurement_type_surfaces"
-                        }
-                    },
-                    "required": ["measurement_type_surfaces"]
-                },
-                {
-                    "title": "Mittendurchmesser-Stichprobe",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_mid_sample": {
-                            "$ref": "#/definitions/measurement_type_mid_sample"
-                        }
-                    },
-                    "required": ["measurement_type_mid_sample"]
-                },
-                {
-                    "title": "Sektions-Raummaßverfahren",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_sectional": {
-                            "$ref": "#/definitions/measurement_type_sectional"
-                        }
-                    },
-                    "required": ["measurement_type_sectional"]
-                },
-                {
-                    "title": "Foto-Optische-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_photo_optical": {
-                            "$ref": "#/definitions/measurement_type_photo_optical"
-                        }
-                    },
-                    "required": ["measurement_type_photo_optical"]
-                },
-                {
-                    "title": "Harvester-Maß",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_harvester": {
-                            "$ref": "#/definitions/measurement_type_harvester"
-                        }
-                    },
-                    "required": ["measurement_type_harvester"]
-                },
-                {
-                    "title": "Kran-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_crane": {
-                            "$ref": "#/definitions/measurement_type_crane"
-                        }
-                    },
-                    "required": ["measurement_type_crane"]
-                },
-            ]
-        },
-        "industrie_measured":{
-            "type": "object",
-            "title": "Werkmaß",
-            "type": "object",
-            "oneOf": [
-                {
-                    "title": "Einzelstamm-Werk",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_single_log_industrie": {
-                            "$ref": "#/definitions/measurement_type_single_log_industrie"
-                        }
-                    },
-                    "required": ["measurement_type_single_log_industrie"]
-                },
-                {
-                    "title": "Foto-Optische-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_photo_optical": {
-                            "$ref": "#/definitions/measurement_type_photo_optical"
-                        }
-                    },
-                    "required": ["measurement_type_photo_optical"]
-                },
-                {
-                    "title": "Gravimetrische-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_gravimetric": {
-                            "$ref": "#/definitions/measurement_type_gravimetric"
-                        }
-                    },
-                    "required": ["measurement_type_gravimetric"]
-                },
-                {
-                    "title": "Volumen-Vermessung",
-                    "type": "object",
-                    "properties": {
-                        "measurement_type_volume": {
-                            "$ref": "#/definitions/measurement_type_volume"
-                        }
-                    },
-                    "required": ["measurement_type_volume"]
-                },
+                "calibration_id",
+                "calibrated_until"
             ]
         },
         "diameter_length":{
-            "title": "Durchmesser (neu)",
+            "title": "Durchmesser",
             "type": "array",
             "minItems":1,
             "items": {
@@ -6011,13 +4684,13 @@ export default{
                     "under_bark": {
                         "type": "boolean",
                         "title": "Messung ohne Rinde",
-                        "description": "Wurde unter der Rinde gemessen?",
+                        "description": "Angabe, ob unter der Rinde gemessen wurde",
                         "format": "checkbox"
                     },
                     "diameter_position": {
                         "type": "number",
                         "title": "Position",
-                        "description": "Höhe gemessen vom dickerem Stammende"
+                        "description": "Position der Durchmesserermittlung, gemessen in cm vom dickeren Stammende"
                     }
                 },
                 "required": [
@@ -6027,7 +4700,7 @@ export default{
             }
         },
         "quality_definition":{
-            "title": "Qualität (neu)",
+            "title": "Qualität",
             "type": "object",
             "properties": {
                 "qual_type": {
@@ -6116,6 +4789,166 @@ export default{
                 }
             }
         },
+        "haul_measured": {
+            "type": "object",
+            "title": "Holzmenge",
+            "description": "Die beförderte Menge, definiert durch das Aufnahmeverfahren.",
+            "additionalProperties": false,
+            "oneOf": [
+                {
+                    "title": "Einzelstammvermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_single_log": {
+                            "$ref": "#/definitions/measurement_type_single_log"
+                        }
+                    },
+                    "required": ["measurement_type_single_log"]
+                },
+                {
+                    "title": "Foto-Optische-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_photo_optical": {
+                            "$ref": "#/definitions/measurement_type_photo_optical"
+                        }
+                    },
+                    "required": ["measurement_type_photo_optical"]
+                },
+                {
+                    "title": "Kran-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_crane": {
+                            "$ref": "#/definitions/measurement_type_crane"
+                        }
+                    },
+                    "required": ["measurement_type_crane"]
+                }
+            ]
+        },
+        "forest_measured":{
+            "type": "object",
+            "title": "Waldmaß",
+            "oneOf": [
+                {
+                    "title": "Einzelstammvermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_single_log": {
+                            "$ref": "#/definitions/measurement_type_single_log"
+                        }
+                    },
+                    "required": ["measurement_type_single_log"]
+                },
+                {
+                    "title": "Stirnflächenverfahren",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_surfaces": {
+                            "$ref": "#/definitions/measurement_type_surfaces"
+                        }
+                    },
+                    "required": ["measurement_type_surfaces"]
+                },
+                {
+                    "title": "Mittendurchmesser-Stichprobe",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_mid_sample": {
+                            "$ref": "#/definitions/measurement_type_mid_sample"
+                        }
+                    },
+                    "required": ["measurement_type_mid_sample"]
+                },
+                {
+                    "title": "Sektions-Raummaßverfahren",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_sectional": {
+                            "$ref": "#/definitions/measurement_type_sectional"
+                        }
+                    },
+                    "required": ["measurement_type_sectional"]
+                },
+                {
+                    "title": "Foto-Optische-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_photo_optical": {
+                            "$ref": "#/definitions/measurement_type_photo_optical"
+                        }
+                    },
+                    "required": ["measurement_type_photo_optical"]
+                },
+                {
+                    "title": "Harvester-Maß",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_harvester": {
+                            "$ref": "#/definitions/measurement_type_harvester"
+                        }
+                    },
+                    "required": ["measurement_type_harvester"]
+                },
+                {
+                    "title": "Kran-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_crane": {
+                            "$ref": "#/definitions/measurement_type_crane"
+                        }
+                    },
+                    "required": ["measurement_type_crane"]
+                }
+            ]
+        },
+        "industrie_measured":{
+            "type": "object",
+            "title": "Werkmaß",
+            "oneOf": [
+                {
+                    "title": "Einzelstamm-Werk",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_single_log_industrie": {
+                            "$ref": "#/definitions/measurement_type_single_log_industrie"
+                        }
+                    },
+                    "required": ["measurement_type_single_log_industrie"]
+                },
+                {
+                    "title": "Foto-Optische-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_photo_optical": {
+                            "$ref": "#/definitions/measurement_type_photo_optical"
+                        }
+                    },
+                    "required": ["measurement_type_photo_optical"]
+                },
+                {
+                    "title": "Gravimetrische-Vermessung",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_gravimetric": {
+                            "$ref": "#/definitions/measurement_type_gravimetric"
+                        }
+                    },
+                    "required": ["measurement_type_gravimetric"]
+                },
+                {
+                    "title": "Harvester-Maß",
+                    "type": "object",
+                    "properties": {
+                        "measurement_type_harvester": {
+                            "$ref": "#/definitions/measurement_type_harvester"
+                        }
+                    },
+                    "required": ["measurement_type_harvester"]
+                }
+            ]
+        },
         "measurement_type_single_log":{
             "title": "Einzelstamm",
             "type": "object",
@@ -6149,10 +4982,16 @@ export default{
                             },
                             "stem_length": {
                                 "title": "Stammlänge",
-                                "type": "number" 
+                                "$ref": "#/definitions/integer"
                             },
-                            "diameter_length": {
-                                "$ref": "#/definitions/diameter_length",
+                            "diameter": {
+                                "title": "Stammdurchmesser",
+                                "$ref": "#/definitions/integer"
+                            },
+                            "thickness_class": {
+                                "$ref": "#/definitions/thickness_class",
+                                "title": "Stärkeklasse",
+                                "description": "Klassifizierung der mittleren Stammstärke"
                             },
                             "part_no": {
                                 "$ref": "#/definitions/part_no",
@@ -6160,15 +4999,15 @@ export default{
                                 "description": "Nummerierung des Klammerstammstückes (1 = Erdstammstück, 2 = erstes Folgestück, etc.)"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             }
                         },
                         "required": [
                             "species",
                             "stem_length",
-                            "diameter_length"
+                            "diameter"
                         ]
-                    },
+                    }
                 }
             },
             "required": [
@@ -6207,13 +5046,13 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             }
                         },
                         "required": [
                             "species"
                         ]
-                    },
+                    }
                 },
                 "count": { 
                     "title": "Stückzahl",
@@ -6237,7 +5076,7 @@ export default{
                     "minItems": 1,
                     "items":{
                         "title": "Durchmesser",
-                        "type": "number",
+                        "type": "number"
                     }
                 },
                 "pile_back": {
@@ -6247,12 +5086,12 @@ export default{
                     "default": 0,
                     "items":{
                         "title": "Durchmesser",
-                        "type": "number",
+                        "type": "number"
                     }
                 }
             },
             "required": [
-            ],
+            ]
         },
         "measurement_type_mid_sample":{
             "title": "Mittendurchmesser-Stichprobe",
@@ -6287,13 +5126,13 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             }
                         },
                         "required": [
                             "species"
                         ]
-                    },
+                    }
                 },
                 "count": { 
                     "title": "Stückzahl",
@@ -6309,11 +5148,10 @@ export default{
                     "minItems": 1,
                     "items":{
                         "title": "Durchmesser",
-                        "type": "number",
+                        "type": "number"
                     }
-                },
-            },
-            "required": [],
+                }
+            }
         },
         "measurement_type_sectional":{
             "title": "Mittendurchmesser-Stichprobe",
@@ -6347,18 +5185,17 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             },
-                            "conversion_factor":{
-                                "title": "Umrechnungsfaktor",
-                                "type": "number"
+                            "conversion_factor_qm":{
+                                "$ref": "#/definitions/conversion_factor_qm"
                             }
                         },
                         "required": [
                             "species_quality",
                             "species"
                         ]
-                    },
+                    }
                 },
                 "count": { 
                     "title": "Stückzahl",
@@ -6374,20 +5211,41 @@ export default{
                     "minItems": 1,
                     "items":{
                         "title": "Sektionshöhe",
-                        "type": "number",
+                        "type": "number"
                     }
-                },
+                }
             },
             "required": [
                 "sample",
                 "count",
                 "sort_length"
+            ]
+        },
+        "measuring_technique_photo_optical": {
+            "title": "Messtechnik",
+            "enum": [
+                "foha",
+                "foim",
+                "fomo"
             ],
+            "options": {
+                "enum_titles": [
+                    "Foto-optisches Messverfahren (handgeführtes Gerät)",
+                    "Foto-optisches Messverfahren (montiertes/immobiles Gerät)",
+                    "Foto-optisches Messverfahren (montiertes/mobiles Gerät)"
+                ]
+            },
+            "type": "string"
         },
         "measurement_type_photo_optical":{
-            "title": "Mittendurchmesser-Stichprobe",
+            "title": "Foto-Optische-Vermessung",
             "type": "object",
             "properties": {
+                "measuring_technique_photo_optical":{
+                    "title": "Messtechnik",
+                    "$ref": "#/definitions/measuring_technique_photo_optical",
+                    "type": "string"
+                },
                 "measurement_id": {
                     "title": "Messprotokollnummer",
                     "type": "string"
@@ -6399,7 +5257,7 @@ export default{
                 },
                 "calibration": {
                     "title": "Eichung",
-                    "$ref": "#/definitions/calibration",
+                    "$ref": "#/definitions/calibration"
                 },
                 "estimate": {
                     "type":"array",
@@ -6420,18 +5278,17 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             },
-                            "conversion_factor":{
-                                "title": "Umrechnungsfaktor",
-                                "type": "number"
+                            "conversion_factor_qm":{
+                                "$ref": "#/definitions/conversion_factor_qm"
                             }
                         },
                         "required": [
                             "species_quality",
                             "species"
                         ]
-                    },
+                    }
                 },
                 "count": { 
                     "title": "Stückzahl",
@@ -6450,13 +5307,13 @@ export default{
                     "title": "Fläche Polterrückseite",
                     "description": "In qm",
                     "type": "number"
-                },
+                }
             },
             "required": [
                 "sample",
                 "count",
                 "sort_length"
-            ],
+            ]
         },
         "measurement_type_harvester":{
             "title": "Harvester-Maß",
@@ -6491,13 +5348,13 @@ export default{
                                 "enum": [
                                     "machine",
                                     "operator",
-                                    "auditor",
+                                    "auditor"
                                 ],
                                 "options": {
                                     "enum_titles": [
                                         "Maschine",
                                         "Fahrer",
-                                        "Extern",
+                                        "Extern"
                                     ]
                                 }
                             },
@@ -6511,16 +5368,16 @@ export default{
                                 "type": "number" 
                             },
                             "diameter_length": {
-                                "$ref": "#/definitions/diameter_length",
+                                "$ref": "#/definitions/diameter_length"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             }
                         },
                         "required": [
                             "species",
                             "stem_length",
-                            "diameter_length",
+                            "diameter_length"
                         ]
                     }
                 }
@@ -6554,7 +5411,7 @@ export default{
                                 "description": "Angabe zur Holzart"
                             },
                             "weighed_sample": {
-                                "title": "gewogenes Holz der Stichprobe",
+                                "title": "Gewogenes Holz der Stichprobe",
                                 "description": "t lutro mit Rinde",
                                 "type": "number"
                             },
@@ -6570,10 +5427,10 @@ export default{
                                             "type": "number" 
                                         },
                                         "diameter_length": {
-                                            "$ref": "#/definitions/diameter_length",
+                                            "$ref": "#/definitions/diameter_length"
                                         },
                                         "quality_definition":{
-                                            "$ref": "#/definitions/quality_definition",
+                                            "$ref": "#/definitions/quality_definition"
                                         }
                                     }
                                 }
@@ -6582,25 +5439,43 @@ export default{
                         "required": [
                             "species",
                             "stem_length",
-                            "diameter_length",
+                            "diameter_length"
                         ]
                     }
                 },
-                "convertion_factor": {
-                    "title": "hiebsbezogener Umrechnungsfaktor",
+                "conversion_factor_qm_t": {
+                    "title": "Hiebsbezogener Umrechnungsfaktor",
                     "description": "Fm ohne Rinde / t lutro mit Rinde",
                     "type": "number"
-                },
+                }
             },
             "required": [
-                "convertion_factor",
+                "conversion_factor_qm_t",
                 "sample"
             ]
         },
+        "measuring_technique_single_log_industrie": {
+            "enum": [
+                "fewi",
+                "vawi"
+            ],
+            "options": {
+                "enum_titles": [
+                    "fester Winkel",
+                    "variabler Winkel"
+                ]
+            },
+            "type": "string"
+        },
         "measurement_type_single_log_industrie":{
-            "title": "Einzelstamm vermessung",
+            "title": "Einzelstammvermessung",
             "type": "object",
             "properties": {
+                "measuring_technique_single_log_industrie":{
+                    "title": "Messtechnik",
+                    "$ref": "#/definitions/measuring_technique_single_log_industrie",
+                    "type": "string"
+                },
                 "measurement_id": {
                     "title": "Messprotokollnummer",
                     "type": "string"
@@ -6617,9 +5492,8 @@ export default{
                 },
                 "calibration": {
                     "title": "Eichung",
-                    "$ref": "#/definitions/calibration",
+                    "$ref": "#/definitions/calibration"
                 },
-                
                 "log_industrie": {
                     "type":"array",
                     "title": "Stamm",
@@ -6648,30 +5522,43 @@ export default{
                                 "title": "Sortenlänge",
                                 "description": "Längenklasse des Holzes gemäß Sortierung"
                             },
-                            "diameter_length_grade": {
-                                "title": "Sortendurchmesser",
-                                "$ref": "#/definitions/diameter_length",
+                            "grade_diameter_one": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Sortendurchmesser 1",
+                                "description": "(Erstes) Messergebnis des Sortendurchmessers"
+                            },
+                            "grade_diameter_two": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Sortendurchmesser 2",
+                                "description": "Zweites Messergebnis des Sortendurchmessers (Bei kreuzweiser Messung)"
+                            },
+                            "grade_diameter_three": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Sortendurchmesser 3",
+                                "description": "(Erstes) Messergebnis des Sortendurchmessers"
+                            },
+                            "grade_diameter_four": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Sortendurchmesser 4",
+                                "description": "Zweites Messergebnis des Sortendurchmessers (Bei kreuzweiser Messung)"
                             },
                             "diameter_length_forest": {
                                 "title": "Forstlicher Mittendurchmesser",
-                                "maxItems":1,
                                 "description": "Mittendurchmesser des Stammes, forstlich abgerundet",
-                                "$ref": "#/definitions/diameter_length",
+                                "$ref": "#/definitions/integer"
                             },
-                            "diameter_length_top": {
+                            "top_diameter": {
+                                "$ref": "#/definitions/integer",
                                 "title": "Zopfdurchmesser",
-                                "maxItems":4,
-                                "description": "Messung am dünnsten Stammende",
-                                "$ref": "#/definitions/diameter_length",
+                                "description": "Durchmesser des dünnen Stammendes"
                             },
-                            "diameter_length_bottom": {
-                                "title": "Stammfußsurchmesser",
-                                "maxItems":4,
-                                "description": "Messung am dicksten Stammende",
-                                "$ref": "#/definitions/diameter_length",
+                            "bottom_diameter": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Stammfußdurchmesser",
+                                "description": "Durchmesser des dicken Stammendes"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             },
                             "shrinking": {
                                 "$ref": "#/definitions/shrinking",
@@ -6680,22 +5567,22 @@ export default{
                             },
                             "crook": {
                                 "$ref": "#/definitions/crook",
-                                "title": "realen Krümmung",
+                                "title": "Absolute Krümmung",
                                 "description": "Zentimeterabweichung der Stammmitte von der Stammgeraden je Meter [cm/m]"
                             },
                             "crook_mid": {
                                 "type": "number",
-                                "title": "mittlere Krümmung",
+                                "title": "Mittlere Krümmung",
                                 "description": "Quotient des Mittelwertes der überschreitenden Krümmungen und des Mittelwertes der beiden Quelldurchmesser [%]"
                             },
                             "ovality": {
                                 "$ref": "#/definitions/ovality",
-                                "title": "absolute Ovalität",
+                                "title": "Absolute Ovalität",
                                 "description": "Verhältnis des größten zum geringsten Durchmesser in Stammmitte bei kreuzweiser Vermessung [cm/cm]"
                             },
                             "ovality_relative": {
                                 "$ref": "#/definitions/ovality",
-                                "title": "relative Ovalität",
+                                "title": "Relative Ovalität",
                                 "description": "Quotient aus ovalitätsbedingter Ringkreisfläche und der realen Mittendurchmesserkreisfläche [%]"
                             },
                             "single_log_thickness_class": {
@@ -6718,12 +5605,13 @@ export default{
                             "species",
                             "stem_length",
                             "diameter_length",
+                            "grade_diameter_one",
                             "single_log_thickness_class",
                             "diameter_length_top",
                             "crook_mid",
                             "ovality_relative"
                         ]
-                    },
+                    }
                 }
             },
             "required":[
@@ -6745,12 +5633,12 @@ export default{
                     "format": "datetime-local"
                 },
                 "calibration": {
-                    "title": "geeichtes Geräte",
+                    "title": "Geeichte Geräte",
                     "type": "array",
                     "items":{
-                        "title": "geeichtes Gerät",
+                        "title": "Geeichtes Gerät",
                         "type": "object",
-                        "$ref": "#/definitions/calibration",
+                        "$ref": "#/definitions/calibration"
                     }
                 },
                 "sample": {
@@ -6772,168 +5660,101 @@ export default{
                                 "description": "Prozentualer Anteil der Trockenmasse am Poltergesamtgewicht",
                                 "type": "number"
                             },
-                            "calculated_amount": {
-                                "$ref": "#/definitions/calculated_amount",
-                                "title": "Menge",
+                            "weighed_amount": {
+                                "$ref": "#/definitions/integer",
+                                "title": "Gewicht",
+                                "description": "Gemessenes Gewicht in Tonnen"
                             },
                             "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
+                                "$ref": "#/definitions/quality_definition"
                             }
                         },
                         "required": [
                             "species",
                             "stem_length",
-                            "diameter_length",
+                            "diameter_length"
                         ]
                     }
                 },
-                "convertion_factor": {
+                "conversion_factor_qm_t": {
                     "title": "hiebsbezogener Umrechnungsfaktor",
                     "description": "Fm ohne Rinde / t lutro mit Rinde",
                     "type": "number"
-                },
+                }
             },
             "required": [
-                "convertion_factor",
+                "conversion_factor_qm_t",
                 "sample"
             ]
         },
-        "measurement_type_volume":{
-            "title": "Volumenaggregation",
-            "type": "object",
+        "route_definition":{
             "properties": {
-                "measurement_id": {
-                    "title": "Messprotokollnummer",
-                    "type": "string"
+                "crs": {
+                    "$ref": "#/definitions/crs"
                 },
-                "measurement_datetime": {
-                    "title": "Vermessungsdatum",
-                    "type": "string",
-                    "format": "datetime-local"
-                },
-                "calibration": {
-                    "title": "geeichtes Geräte",
+                "route": {
                     "type": "array",
+                    "minItems": 2,
+                    "description": "Strecke auf der Karte",
                     "items":{
-                        "title": "geeichtes Gerät",
-                        "type": "object",
-                        "$ref": "#/definitions/calibration",
-                    }
-                },
-                "sample": {
-                    "type":"array",
-                    "title": "Messungen",
-                    "format": "tabs",
-                    "minItems": 1,
-                    "items": {
-                        "title": "Messung",
-                        "type": "object",
-                        "properties": {
-                            "species": {
-                                "$ref": "#/definitions/species",
-                                "title": "Holzart",
-                                "description": "Angabe zur Holzart"
-                            },
-                            "calculated_amount": {
-                                "$ref": "#/definitions/calculated_amount",
-                                "title": "Menge",
-                            },
-                            "quality_definition":{
-                                "$ref": "#/definitions/quality_definition",
-                            },
-                            "mean_length": {
-                                "$ref": "#/definitions/mean_length",
-                                "title": "Mittlere Länge",
-                                "description": "(Mittlere) Länge des Holzes in der Aggregation"
-                            },
-                            "diameter_length": {
-                                "$ref": "#/definitions/diameter_length",
-                            },
-                            "single_log_thickness_class": {
-                                "$ref": "#/definitions/single_log_thickness_class",
-                                "title": "Stärkeklasse",
-                                "description": "Klassifizierung des Stammes je Durchmesser"
-                            },
-                            "attribute": {
-                                "$ref": "#/definitions/attribute",
-                                "title": "Preismerkmale",
-                                "description": "Holzmerkmale die den Preis beeinflussen"
-                            }
-                        },
-                        "required": [
-                            "species",
-                            "stem_length",
-                            "diameter_length",
-                        ]
-                    }
-                },
-                "convertion_factor": {
-                    "title": "hiebsbezogener Umrechnungsfaktor",
-                    "description": "Fm ohne Rinde / t lutro mit Rinde",
-                    "type": "number"
-                },
-            },
-            "required": [
-                "convertion_factor",
-                "sample"
-            ]
-        },
-        "calibration":{
-            "type":"object",
-            "properties":{
-                "calibration_id": {
-                    "$ref": "#/definitions/calibration_id",
-                    "title": "Eich-ID",
-                    "description": "ID zur Überprüfung der Eichung"
-                },
-                "calibrated_until": {
-                    "$ref": "#/definitions/calibrated_until",
-                    "title": "Eichung gültig bis",
-                    "description": "Datum bis zu dem das Gerät geeicht ist"
-                },
-                "calibrated_values": {
-                    "type": "array",
-                    "title": "geeichte Messergebnisse",
-                    "description": "Liste der Messergebnisse, die durch das geeichte Verfahren erhoben wurden.",
-                    "items":{
-                        "title": "geeichte Messung",
-                        "properties": {
-                            "calibrated_value": {
-                                "title": "Feldname",
-                                "type": "string",
-                                "enum": [
-                                    "real_length",
-                                    "grade_length",
-                                    "grade_diameter",
-                                    "..."
-                                ],
-                                "options": {
-                                    "enum_titles": [
-                                        "Reale Länge",
-                                        "Sortenlänge",
-                                        "Sortendurchmesser",
-                                        "..."
-                                    ]
-                                },
-                            }
-                        }
+                        "$ref": "#/definitions/lon_lat" 
                     }
                 }
             },
-            "required":[
-
+            "required":["route"]
+        },
+        "lon_lat": {
+            "title": "Koordinatenpaar",
+            "description":"Longitude, Latitude",
+            "type": "object",
+            "properties": {
+                "longitude": {
+                    "$ref": "#/definitions/longitude",
+                    "title": "Längengrad",
+                    "description": "Ost-Koordinate in Dezimalgrad (z.B.: 8,916091918945312)"
+                },
+                "latitude": {
+                    "$ref": "#/definitions/latitude",
+                    "title": "Breitengrad",
+                    "description": "Nord-Koordinate in Dezimalgrad (z.B.: 49,86861816524657)"
+                }
+            }
+        },
+        "integer": {
+            "type": "number",
+            "maximum": 255
+        },
+        "string255": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "string50": {
+            "type": "string",
+            "maxLength": 50
+        },
+        "string36": {
+            "type": "string",
+            "maxLength": 36
+        },
+        "string": {
+            "type": "string"
+        },
+        "image_encode": {
+            "type": "string",
+            "enum": [
+                "base64"
+            ],
+            "enum_titles": [
+                "Base64"
             ]
         }
     },
     "properties": {
         "document": {
-            "$ref": "#/definitions/document",
-        },
+            "$ref": "#/definitions/document"
+        }
     },
     "required": [
         "document"
-    ],
-    "ok": true,
-    "warnings": [],
-    "href": "http://localhost:3000/schema/1.0.2.json"
+    ]
 }
